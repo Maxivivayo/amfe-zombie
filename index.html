@@ -12,7 +12,7 @@
   --px:3px;
 }
 *{box-sizing:border-box}
-html,body{margin:0;min-height:100%;background:#0b1020;color:var(--white);font-family:"Courier New",monospace;overflow-x:hidden}
+html,body{margin:0;min-height:100%;background:#0b1020;color:var(--white);font-family:"Courier New",monospace;overflow-x:hidden;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 button,input,textarea{font:inherit}
 button{cursor:pointer}
 .pixel{
@@ -223,11 +223,11 @@ input[type=text],input[type=number],textarea{
 #lessonBanner b{color:var(--yellow)}
 #lessonBanner .lessonSmall{font-size:12px;color:#cfe9ef;margin-top:4px}
 
-.overlay{position:absolute;inset:0;background:#050814e8;z-index:20;display:none;place-items:center;padding:18px;overflow:auto}
+.overlay{position:absolute;inset:0;background:#050814e8;z-index:20;display:none;place-items:center;padding:18px;overflow:auto;overscroll-behavior:contain}
 .overlay.show{display:grid}
 .challengeBox{
   width:min(860px,100%);background:#17213b;border:4px solid #f3df95;box-shadow:0 0 0 5px #060912,10px 10px 0 #060912;
-  padding:22px;max-height:94vh;overflow:auto
+  padding:22px;max-height:calc(100dvh - 24px);overflow-y:auto;-webkit-overflow-scrolling:touch
 }
 .challengeHeader{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;border-bottom:3px solid #52627d;padding-bottom:12px}
 .challengeHeader h3{margin:0;color:var(--yellow);font-size:clamp(19px,4vw,28px)}
@@ -292,9 +292,19 @@ kbd{background:#f1ead0;color:#101525;border:2px solid #101525;padding:1px 5px;fo
   #touchControls{display:flex}
   #topButtons{bottom:85px}
   .formrow{grid-template-columns:1fr}
-  .bins{grid-template-columns:1fr}
+  .cards{display:grid;grid-template-columns:1fr;gap:6px}
+  .card{min-height:0;padding:8px;font-size:13px}
+  .bins{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;position:sticky;bottom:0;background:#17213b;padding-top:6px}
+  .binbtn{min-height:54px;padding:6px 3px;font-size:10px;overflow-wrap:anywhere}
   .scoreGrid{grid-template-columns:1fr}
-  .challengeBox{padding:14px}
+  .overlay{place-items:start center;padding:8px}
+  .challengeBox{padding:12px;max-height:calc(100dvh - 16px);margin:auto 0;box-shadow:0 0 0 3px #060912,5px 5px 0 #060912}
+  .challengeHeader{display:block;padding-bottom:8px}
+  .challengeType{display:inline-block;margin-top:8px}
+  .challengeBody{padding-bottom:24px}
+  .question{font-size:15px;margin:12px 0}
+  .options{gap:8px}
+  .optbtn{min-height:48px;padding:10px 12px;font-size:14px}
 
   #startScreen{overflow:auto;place-items:start center}
   .startPanel{
