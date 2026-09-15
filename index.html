@@ -1,0 +1,2360 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Misión AMFE — Aventura retro de Gestión de la Calidad</title>
+<style>
+:root{
+  --ink:#101525;--night:#18213a;--navy:#24345c;--steel:#465b7a;--sky:#7cc8ff;
+  --cream:#fff3c4;--white:#fffef2;--yellow:#ffd54a;--orange:#ff8d3a;--red:#e84d5b;
+  --green:#53d769;--cyan:#4bd5d1;--purple:#9e6cff;--brown:#8f5a3c;--gray:#b7c0cf;
+  --px:3px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:#0b1020;color:var(--white);font-family:"Courier New",monospace;overflow-x:hidden}
+button,input,textarea{font:inherit}
+button{cursor:pointer}
+.pixel{
+  border:3px solid #0a0f1c;
+  box-shadow:0 0 0 3px #fff2 inset,5px 5px 0 #080c16;
+  image-rendering:pixelated
+}
+#startScreen{
+  position:relative;
+  height:100vh;height:100dvh;min-height:0;overflow:hidden;
+  display:grid;place-items:center;padding:8px;
+  background:
+    radial-gradient(circle at 50% 18%,#426b8d55 0 16%,transparent 38%),
+    linear-gradient(#0000 0 73%,#11182b 73%),
+    repeating-linear-gradient(90deg,#0000 0 47px,#ffffff08 48px),
+    linear-gradient(#182d50,#294c70 56%,#22334e 57%,#101827);
+}
+#finalScreen{
+  min-height:100vh;display:grid;place-items:center;padding:24px;
+  background:
+    linear-gradient(#0000 0 75%,#11182b 75%),
+    repeating-linear-gradient(90deg,#0000 0 47px,#ffffff08 48px),
+    linear-gradient(#1e315a,#365c83 55%,#263652 56%,#151d30);
+}
+.panel{width:min(960px,100%);background:#17213b;border:4px solid #f5e7a7;padding:clamp(18px,4vw,38px);box-shadow:0 0 0 5px #080c16,10px 10px 0 #080c16}
+.startPanel{
+  width:min(1180px,calc(100vw - 16px));
+  height:min(740px,calc(100vh - 16px));height:min(740px,calc(100dvh - 16px));
+  max-height:calc(100vh - 16px);max-height:calc(100dvh - 16px);
+  padding:clamp(9px,1.7vh,18px);
+  display:grid;
+  grid-template-rows:auto minmax(0,1fr) auto auto;
+  gap:clamp(6px,1.2vh,12px);
+  overflow:hidden;
+}
+.brand{text-align:center;min-width:0}
+.startPanel .brand{line-height:1.05}
+.brand h1{margin:0;color:var(--yellow);font-size:clamp(34px,7vw,72px);letter-spacing:3px;text-shadow:5px 5px 0 #8f3a2f,8px 8px 0 #080c16}
+.startPanel .brand h1{
+  font-size:clamp(34px,6.4vh,60px);
+  animation:titlePulse 2.5s steps(2,end) infinite;
+}
+.brand h2{margin:8px 0 0;font-size:clamp(16px,2.8vw,28px)}
+.startPanel .brand h2{font-size:clamp(17px,3vh,27px);margin:4px 0 0}
+.startPanel .brand p{font-size:clamp(11px,1.8vh,16px);margin:5px 0 0}
+.tag{display:inline-block;background:var(--cyan);color:#08121a;padding:8px 12px;margin:12px 0;border:3px solid #08121a;font-weight:900}
+.startPanel .tag{padding:5px 10px;margin:2px 0 6px;font-size:clamp(11px,1.7vh,15px);animation:tagBlink 2.8s steps(2,end) infinite}
+.story{background:#0d1426;padding:16px;border:3px solid var(--steel);line-height:1.5;margin:18px 0}
+.story strong{color:var(--yellow)}
+
+.startMain{
+  min-height:0;
+  display:grid;
+  grid-template-columns:minmax(320px,.9fr) minmax(400px,1.35fr);
+  gap:12px;
+}
+.menuScene{
+  position:relative;min-height:0;overflow:hidden;
+  border:3px solid #536783;background:
+    repeating-linear-gradient(0deg,#ffffff08 0 1px,transparent 1px 5px),
+    linear-gradient(#17375a 0 58%,#101827 58% 100%);
+  box-shadow:inset 0 0 0 3px #080c16;
+}
+.menuScene::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(90deg,transparent 0 48%,#ffffff09 49% 50%,transparent 51% 100%);
+  background-size:14px 100%;opacity:.35;
+}
+.scenePipe{position:absolute;left:0;right:0;top:18%;height:16px;background:#4b6f84;border-top:4px solid #7699aa;border-bottom:4px solid #172333}
+.scenePipe::before,.scenePipe::after{content:"";position:absolute;top:-4px;width:22px;height:95px;background:#4b6f84;border:4px solid #172333}
+.scenePipe::before{left:15%}.scenePipe::after{right:18%}
+.sceneSign{
+  position:absolute;left:50%;top:9%;transform:translateX(-50%);
+  background:#0c1525;border:3px solid #4bd5d1;color:#4bd5d1;
+  padding:5px 10px;font-size:clamp(10px,1.7vh,14px);font-weight:900;z-index:3
+}
+.sceneSiren{
+  position:absolute;right:8%;top:25%;width:32px;height:24px;background:#e84d5b;
+  border:4px solid #111827;z-index:4;animation:sirenFlash .75s steps(2,end) infinite
+}
+.sceneSiren::before{content:"";position:absolute;left:7px;top:-12px;width:10px;height:10px;background:#ff8791;border:3px solid #111827}
+.sceneFloor{position:absolute;left:0;right:0;bottom:0;height:29%;background:#222b3b;border-top:4px solid #697586}
+.sceneConveyor{
+  position:absolute;left:4%;right:4%;bottom:20%;height:34px;border:4px solid #101827;
+  background:repeating-linear-gradient(90deg,#8a96a5 0 24px,#535e6d 24px 34px);
+  animation:beltMove .55s linear infinite
+}
+.sceneConveyor::before{content:"";position:absolute;left:7%;right:7%;top:-15px;height:12px;background:#6ecbd0;box-shadow:52px 0 #6ecbd0,104px 0 #6ecbd0,156px 0 #6ecbd0,208px 0 #6ecbd0}
+.qbotMenu{
+  position:absolute;left:15%;bottom:30%;width:46px;height:56px;z-index:5;
+  animation:qbotBounce .7s steps(2,end) infinite alternate
+}
+.qbotMenu .head{position:absolute;left:7px;top:0;width:32px;height:27px;background:#58d4d2;border:4px solid #101827}
+.qbotMenu .head::before,.qbotMenu .head::after{content:"";position:absolute;top:7px;width:5px;height:5px;background:#fffef2}
+.qbotMenu .head::before{left:5px}.qbotMenu .head::after{right:5px}
+.qbotMenu .body{position:absolute;left:11px;top:28px;width:25px;height:20px;background:#365f7d;border:4px solid #101827}
+.qbotMenu .body::before{content:"Q";position:absolute;inset:-1px;display:grid;place-items:center;color:#ffd54a;font-weight:900;font-size:11px}
+.qbotMenu .leg{position:absolute;bottom:0;width:8px;height:10px;background:#f3d85a;border:3px solid #101827}
+.qbotMenu .leg.l{left:9px;animation:legRun .25s steps(2,end) infinite}.qbotMenu .leg.r{right:8px;animation:legRun .25s steps(2,end) infinite reverse}
+.zombieMenu{
+  position:absolute;bottom:30%;width:38px;height:53px;z-index:4;
+  animation:zombieWalk 7s linear infinite
+}
+.zombieMenu.z2{animation-delay:-3.5s;animation-duration:8.5s;bottom:31%;transform:scale(.86)}
+.zombieMenu .zh{position:absolute;left:7px;top:0;width:25px;height:23px;background:#78a85f;border:4px solid #101827}
+.zombieMenu .zh::after{content:"";position:absolute;right:3px;top:5px;width:5px;height:5px;background:#ff646f}
+.zombieMenu .zb{position:absolute;left:4px;top:23px;width:30px;height:23px;background:#405f84;border:4px solid #101827}
+.zombieMenu .za{position:absolute;left:-5px;top:27px;width:12px;height:7px;background:#78a85f;border:3px solid #101827;transform:rotate(-12deg)}
+.coinMenu{position:absolute;width:16px;height:20px;background:#ffd54a;border:3px solid #8c5f20;z-index:4;animation:coinFloat 1s steps(2,end) infinite alternate}
+.coinMenu.c1{left:46%;bottom:45%}.coinMenu.c2{left:59%;bottom:52%;animation-delay:-.35s}.coinMenu.c3{left:72%;bottom:46%;animation-delay:-.7s}
+
+.startPanel .story{
+  min-height:0;margin:0;padding:clamp(9px,1.6vh,15px);
+  line-height:1.33;font-size:clamp(11px,1.75vh,15px);
+  display:flex;flex-direction:column;justify-content:center;overflow:hidden
+}
+.storyLead{margin:0 0 8px}
+.missionGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:4px 0 8px}
+.missionChip{border:2px solid #40516d;background:#121d33;padding:6px 8px;font-weight:900}
+.amfeMini{margin:4px 0 0;padding:7px 8px;border-left:5px solid var(--cyan);background:#10273b;color:#e7f9f7;font-weight:900;font-size:.92em}
+
+.startFooter{display:flex;align-items:center;justify-content:space-between;gap:12px;min-width:0}
+.startPanel .settings{margin:0;flex:0 0 auto}
+.startPanel .legend{margin:0;text-align:right;font-size:clamp(9px,1.45vh,12px);line-height:1.25;min-width:0}
+.startPanel .formrow{margin:0}
+.startPanel input[type=text]{padding:9px 11px}
+.startPanel .bigbtn{padding:10px 17px}
+
+@keyframes titlePulse{50%{text-shadow:3px 3px 0 #8f3a2f,6px 6px 0 #080c16;transform:translateY(1px)}}
+@keyframes tagBlink{50%{filter:brightness(1.3)}}
+@keyframes sirenFlash{50%{background:#66212d;box-shadow:none}0%,100%{box-shadow:0 0 18px #ff4756}}
+@keyframes beltMove{to{background-position:34px 0}}
+@keyframes qbotBounce{to{transform:translateY(-6px)}}
+@keyframes legRun{50%{transform:translateY(-4px)}}
+@keyframes zombieWalk{from{left:108%}to{left:-15%}}
+@keyframes coinFloat{to{transform:translateY(-7px) scaleX(.55)}}
+
+.audioGate{
+  position:absolute;inset:0;z-index:60;display:grid;place-items:center;
+  background:#070b14e8;backdrop-filter:blur(2px);padding:16px;
+}
+.audioGate.hidden{display:none}
+.audioGateBox{
+  width:min(520px,92%);text-align:center;background:#17213b;border:4px solid #f3df95;
+  box-shadow:0 0 0 5px #060912,10px 10px 0 #060912;padding:22px;
+}
+.audioGateBox h3{margin:0 0 8px;color:#ffd54a;font-size:clamp(22px,4vw,34px)}
+.audioGateBox p{margin:6px 0 16px;line-height:1.35}
+.audioGateBtn{font-size:clamp(18px,3vw,26px);padding:14px 22px}
+.audioStatus{margin-top:10px;font-size:12px;color:#cfe9ef}
+@keyframes audioReadyFlash{50%{filter:brightness(1.45)}}
+.audioReady{animation:audioReadyFlash .5s steps(2,end) 3}
+
+.formrow{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:end}
+label{font-weight:900;color:var(--yellow)}
+input[type=text],input[type=number],textarea{
+  width:100%;background:#fbf4d6;color:#101525;border:3px solid #101525;padding:12px;outline:none;box-shadow:inset 4px 4px 0 #c5b98f
+}
+.bigbtn,.smallbtn,.optbtn,.binbtn{
+  border:3px solid #0b1020;background:var(--yellow);color:#101525;font-weight:900;padding:12px 18px;box-shadow:4px 4px 0 #080c16;text-transform:uppercase
+}
+.bigbtn:hover,.smallbtn:hover,.optbtn:hover,.binbtn:hover{transform:translate(-1px,-1px);box-shadow:5px 5px 0 #080c16}
+.bigbtn:active,.smallbtn:active,.optbtn:active,.binbtn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 #080c16}
+.settings{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.smallbtn{background:#dbe7f7;padding:9px 12px}
+.legend{font-size:13px;color:#d1ddf0;margin-top:14px}
+#gameScreen{display:none;position:fixed;inset:0;background:#050812}
+#gameWrap{position:absolute;inset:0;display:grid;place-items:center}
+#gameCanvas{display:block;background:#15213b;max-width:100vw;max-height:100vh;image-rendering:pixelated;touch-action:none}
+#hud{
+  position:absolute;left:10px;right:10px;top:10px;display:flex;justify-content:space-between;gap:10px;
+  pointer-events:none;font-weight:900;text-shadow:2px 2px 0 #000;z-index:3
+}
+.hudbox{background:#0b1020cc;border:2px solid #f4e7a6;padding:7px 10px;min-width:130px}
+#levelTitle{text-align:center;flex:1}
+#progressOuter{height:10px;border:2px solid #0b1020;background:#303b51;margin-top:5px}
+#progressInner{height:100%;background:var(--green);width:0%}
+#clock{display:inline-block;min-width:54px}
+#clock.danger{
+  color:#fff;
+  background:#d61f32;
+  border:2px solid #ff8b96;
+  padding:1px 5px;
+  box-shadow:0 0 12px #ff3347,0 0 22px #ff334799;
+  animation:timerPulse .45s steps(2,end) infinite;
+}
+@keyframes timerPulse{
+  0%,100%{transform:scale(1);filter:brightness(1)}
+  50%{transform:scale(1.18);filter:brightness(1.45)}
+}
+
+#topButtons{position:absolute;right:12px;bottom:12px;z-index:8;display:flex;gap:8px}
+#touchControls{position:absolute;inset:auto 0 10px 0;display:none;justify-content:space-between;padding:0 14px;z-index:7;pointer-events:none}
+.touchCluster{display:flex;gap:10px;pointer-events:auto}
+.touchBtn{width:64px;height:64px;border-radius:10px;border:3px solid #fff8;background:#0b1020aa;color:#fff;font-weight:900;font-size:20px;touch-action:none}
+.touchBtn.wide{width:76px;font-size:12px}
+#prompt{
+  position:absolute;left:50%;bottom:90px;transform:translateX(-50%);background:#0b1020e8;border:3px solid #f2d55c;
+  padding:8px 14px;z-index:6;display:none;text-align:center;font-weight:900;max-width:88%
+}
+#lessonBanner{
+  position:absolute;left:50%;top:88px;transform:translateX(-50%) translateY(-18px);
+  z-index:12;width:min(720px,90%);background:#10273bea;border:3px solid var(--cyan);
+  box-shadow:5px 5px 0 #070b14;padding:12px 16px;opacity:0;pointer-events:none;
+  transition:.18s ease;line-height:1.35
+}
+#lessonBanner.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#lessonBanner b{color:var(--yellow)}
+#lessonBanner .lessonSmall{font-size:12px;color:#cfe9ef;margin-top:4px}
+
+.overlay{position:absolute;inset:0;background:#050814e8;z-index:20;display:none;place-items:center;padding:18px;overflow:auto}
+.overlay.show{display:grid}
+.challengeBox{
+  width:min(860px,100%);background:#17213b;border:4px solid #f3df95;box-shadow:0 0 0 5px #060912,10px 10px 0 #060912;
+  padding:22px;max-height:94vh;overflow:auto
+}
+.challengeHeader{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;border-bottom:3px solid #52627d;padding-bottom:12px}
+.challengeHeader h3{margin:0;color:var(--yellow);font-size:clamp(19px,4vw,28px)}
+.challengeType{background:var(--purple);padding:4px 8px;border:2px solid #070b14;font-size:12px;font-weight:900}
+.challengeBody{line-height:1.5}
+.question{font-size:18px;font-weight:900;margin:18px 0}
+.options{display:grid;gap:10px}
+.optbtn{text-align:left;background:#eef2df;text-transform:none}
+.optbtn.correct{background:#8df19b}
+.optbtn.wrong{background:#ff9aa4}
+.feedback{display:none;margin-top:16px;padding:13px;border:3px solid #73839b;background:#0d1426}
+.feedback.show{display:block}
+.feedback.good{border-color:var(--green)}
+.feedback.bad{border-color:var(--orange)}
+.cardZone{display:grid;gap:12px}
+.cards{display:flex;gap:10px;flex-wrap:wrap}
+.card{background:#f7efcf;color:#11182b;border:3px solid #11182b;padding:10px;min-height:56px;flex:1 1 180px;font-weight:900}
+.card.selected{outline:4px solid var(--cyan)}
+.bins{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.binbtn{background:#cde4f1;min-height:58px}
+.assignment{margin-top:12px;font-size:14px;color:#d8e4f4}
+.machine{
+  background:#263652;border:4px solid #0a0f1c;padding:18px;margin:14px 0;box-shadow:inset 0 0 0 4px #52627d;
+  text-align:center
+}
+.machine .formula{font-size:clamp(22px,5vw,40px);color:var(--yellow);font-weight:900}
+.sequence{display:grid;gap:8px}
+.seqrow{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;background:#0f1830;padding:9px;border:2px solid #5d6c83}
+.notice{padding:10px;background:#0e1830;border-left:6px solid var(--cyan);margin:12px 0}
+.badgeToast{
+  position:absolute;left:50%;top:25%;transform:translate(-50%,-50%) scale(.8);z-index:40;background:#fff0a8;color:#101525;border:4px solid #101525;
+  padding:18px 26px;font-weight:900;text-align:center;opacity:0;pointer-events:none;transition:.18s
+}
+.badgeToast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+#levelSplash{position:absolute;inset:0;z-index:18;display:none;place-items:center;background:#060a14dc;text-align:center;padding:20px}
+#levelSplash.show{display:grid}
+#levelSplash h2{font-size:clamp(30px,6vw,58px);color:var(--yellow);margin:0;text-shadow:5px 5px 0 #8f3a2f}
+#levelSplash p{font-size:clamp(15px,2.5vw,22px)}
+#pauseOverlay .challengeBox{text-align:center}
+.finalTitle{color:var(--yellow);font-size:clamp(34px,7vw,70px);text-align:center;text-shadow:5px 5px #8f3a2f}
+.scoreGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.scoreCard{background:#0c1426;border:3px solid #536783;padding:12px}
+.badges{display:flex;gap:8px;flex-wrap:wrap}
+.badge{background:#f5df7d;color:#11182b;border:3px solid #11182b;padding:7px 10px;font-weight:900}
+.reflections{display:grid;gap:12px;margin-top:18px}
+.reflections label{display:grid;gap:6px}
+.chain{text-align:center;font-weight:900;color:var(--cyan);line-height:1.6}
+.copymsg{display:none;margin-top:10px;padding:10px;background:#133624;border:3px solid var(--green)}
+.copymsg.show{display:block}
+.ranking{margin-top:18px;background:#0c1426;border:3px solid #536783;padding:14px}
+.ranking h3{margin:0 0 10px;color:var(--yellow)}
+.rankingTable{width:100%;border-collapse:collapse}
+.rankingTable th,.rankingTable td{padding:8px;border-bottom:2px solid #34435e;text-align:left}
+.rankingTable th:nth-child(1),.rankingTable td:nth-child(1),.rankingTable th:nth-child(3),.rankingTable td:nth-child(3){text-align:center}
+.rankingEmpty{color:var(--gray);margin:0}
+#startRanking{max-height:150px;overflow:auto}
+kbd{background:#f1ead0;color:#101525;border:2px solid #101525;padding:1px 5px;font-weight:900}
+@media(max-width:760px){
+  #hud{font-size:11px;top:5px;left:5px;right:5px}
+  .hudbox{min-width:0;padding:5px 7px}
+  #levelTitle{display:none}
+  #touchControls{display:flex}
+  #topButtons{bottom:85px}
+  .formrow{grid-template-columns:1fr}
+  .bins{grid-template-columns:1fr}
+  .scoreGrid{grid-template-columns:1fr}
+  .challengeBox{padding:14px}
+
+  #startScreen{overflow:auto;place-items:start center}
+  .startPanel{
+    height:auto;max-height:none;overflow:visible;
+    grid-template-rows:auto auto auto auto;width:100%;
+  }
+  .startMain{grid-template-columns:1fr}
+  .menuScene{min-height:210px}
+  .startFooter{align-items:flex-start;flex-direction:column}
+  .startPanel .legend{text-align:left}
+}
+@media(max-height:680px) and (min-width:761px){
+  .startPanel{gap:5px;padding:8px}
+  .startPanel .brand h1{font-size:34px}
+  .startPanel .brand h2{font-size:16px}
+  .startPanel .brand p{display:none}
+  .startPanel .tag{font-size:10px;padding:3px 7px;margin:0 0 3px}
+  .startPanel .story{font-size:10.5px;padding:7px;line-height:1.22}
+  .missionChip{padding:4px 6px}
+  .menuScene{min-height:0}
+  .startPanel .legend{font-size:9px}
+  .startPanel input[type=text]{padding:6px 9px}
+  .startPanel .bigbtn,.startPanel .smallbtn{padding:6px 10px;font-size:11px}
+}
+@media(prefers-reduced-motion:reduce){
+  .startPanel .brand h1,.startPanel .tag,.sceneSiren,.sceneConveyor,.qbotMenu,
+  .qbotMenu .leg,.zombieMenu,.coinMenu{animation:none!important}
+}
+@media(pointer:coarse){#touchControls{display:flex}}
+</style>
+</head>
+<body>
+
+<section id="startScreen">
+  <div id="audioGate" class="audioGate">
+    <div class="audioGateBox">
+      <h3>☣ QUALITY FACTORY</h3>
+      <p>La consola necesita autorización de audio para iniciar la alarma y la música retro.</p>
+      <button class="bigbtn audioGateBtn" id="activateAudioBtn">🔊 ACTIVAR AUDIO</button>
+      <div class="audioStatus">Un clic habilita sonido y música. El navegador no permite reproducirlos antes.</div>
+    </div>
+  </div>
+  <div class="panel startPanel">
+    <div class="brand">
+      <div class="tag">☣ QUALITY FACTORY // AÑO 1996 // ALERTA BIOLÓGICA</div>
+      <h1>MISIÓN AMFE</h1>
+      <h2>PROTOCOLO BROTE CERO</h2>
+      <p>Una aventura industrial retro de Gestión de la Calidad</p>
+    </div>
+
+    <div class="startMain">
+      <div class="menuScene" aria-hidden="true">
+        <div class="scenePipe"></div>
+        <div class="sceneSign">SECTOR 01 · CONTENCIÓN</div>
+        <div class="sceneSiren"></div>
+        <div class="sceneFloor"></div>
+        <div class="sceneConveyor"></div>
+
+        <div class="qbotMenu">
+          <div class="head"></div><div class="body"></div>
+          <div class="leg l"></div><div class="leg r"></div>
+        </div>
+
+        <div class="zombieMenu z1"><div class="zh"></div><div class="zb"></div><div class="za"></div></div>
+        <div class="zombieMenu z2"><div class="zh"></div><div class="zb"></div><div class="za"></div></div>
+
+        <div class="coinMenu c1"></div>
+        <div class="coinMenu c2"></div>
+        <div class="coinMenu c3"></div>
+      </div>
+
+      <div class="story">
+        <p class="storyLead"><strong>EMERGENCIA — PROTOCOLO BROTE CERO:</strong> una infección desconocida alcanzó QUALITY FACTORY.
+        Parte del personal se transformó en <strong>operarios-zombi</strong> y el sistema central de calidad quedó fuera de servicio.
+        Q-BOT debe impedir que el lote Nº 9001 salga sin control.</p>
+
+        <div class="missionGrid">
+          <div class="missionChip">🟡 Recolectá Q-Coins</div>
+          <div class="missionChip">🧟 Esquivá zombis</div>
+          <div class="missionChip">⚙️ Usá líneas y cintas</div>
+          <div class="missionChip">🧠 Resolvé terminales AMFE</div>
+        </div>
+
+        <div class="amfeMini">
+          AMFE DEL PROCESO: PROCESO/FUNCIÓN → MODO DE FALLA / RIESGO → EFECTO → CAUSA → CONTROLES ACTUALES → S/O/D → IPR → ACCIÓN.
+        </div>
+      </div>
+    </div>
+
+    <div class="formrow">
+      <div>
+        <label for="groupName">NOMBRE DEL GRUPO</label>
+        <input id="groupName" type="text" maxlength="40" placeholder="Ej.: Grupo 4" autocomplete="off">
+      </div>
+      <button class="bigbtn" id="startBtn">▶ INICIAR MISIÓN</button>
+    </div>
+
+    <div class="startFooter">
+      <div class="settings">
+        <button class="smallbtn" id="musicBtnStart">♫ MÚSICA MENÚ: ON</button>
+        <button class="smallbtn" id="sfxBtnStart">🔔 Efectos: ON</button>
+      </div>
+      <div class="legend">
+        <kbd>A</kbd>/<kbd>D</kbd> mover · <kbd>SHIFT</kbd> correr ·
+        <kbd>ESPACIO</kbd>/<kbd>W</kbd> saltar · <kbd>E</kbd> terminal · <kbd>P</kbd> pausa
+        <br><span id="audioHint">♫ La música comienza con el primer clic o tecla.</span>
+      </div>
+    </div>
+    <div class="ranking" id="startRanking"></div>
+  </div>
+</section>
+
+<section id="gameScreen">
+  <div id="gameWrap">
+    <canvas id="gameCanvas" width="960" height="540" aria-label="Videojuego de plataformas Misión AMFE"></canvas>
+
+    <div id="hud">
+      <div class="hudbox"><span id="hearts">♥♥♥</span><br>PTS <span id="score">0</span>/100 · 🟡 <span id="chips">0</span><br>Q-COINS <span id="levelCoins">0</span>/<span id="coinGoal">15</span></div>
+      <div class="hudbox" id="levelTitle">NIVEL 1<br>LA FÁBRICA DE LOS CONCEPTOS<div id="progressOuter"><div id="progressInner"></div></div></div>
+      <div class="hudbox">TERMINALES <span id="terminalCount">0/3</span><br>⏱ RESTANTE <span id="clock">00:30</span></div>
+    </div>
+
+    <div id="prompt">E — ACTIVAR TERMINAL AMFE</div>
+    <div id="lessonBanner">
+      <b id="lessonTitle">CÁPSULA AMFE</b>
+      <div id="lessonText"></div>
+      <div class="lessonSmall">Seguí jugando: esta idea vuelve a aparecer en las terminales del nivel.</div>
+    </div>
+
+    <div id="touchControls">
+      <div class="touchCluster">
+        <button class="touchBtn" data-key="left">◀</button>
+        <button class="touchBtn" data-key="right">▶</button>
+      </div>
+      <div class="touchCluster">
+        <button class="touchBtn wide" data-key="run">CORRER</button>
+        <button class="touchBtn" data-key="jump">▲</button>
+        <button class="touchBtn wide" data-key="use">USAR</button>
+      </div>
+    </div>
+
+    <div id="topButtons">
+      <button class="smallbtn" id="musicBtnGame">♫ ON</button>
+      <button class="smallbtn" id="sfxBtnGame">FX ON</button>
+      <button class="smallbtn" id="pauseBtn">Ⅱ</button>
+    </div>
+
+    <div id="levelSplash">
+      <div>
+        <h2 id="splashTitle">NIVEL 1</h2>
+        <p id="splashSubtitle"></p>
+        <button class="bigbtn" id="splashBtn">ENTRAR A LA ZONA</button>
+      </div>
+    </div>
+
+    <div class="overlay" id="challengeOverlay">
+      <div class="challengeBox" role="dialog" aria-modal="true">
+        <div class="challengeHeader">
+          <div>
+            <h3 id="challengeTitle"></h3>
+            <div id="challengeContext"></div>
+          </div>
+          <div class="challengeType" id="challengeType"></div>
+        </div>
+        <div class="challengeBody" id="challengeBody"></div>
+      </div>
+    </div>
+
+    <div class="overlay" id="pauseOverlay">
+      <div class="challengeBox">
+        <h2>PAUSA DE PLANTA</h2>
+        <p>La línea quedó detenida de forma segura.</p>
+        <button class="bigbtn" id="resumeBtn">CONTINUAR</button>
+      </div>
+    </div>
+
+    <div class="badgeToast" id="badgeToast"></div>
+  </div>
+</section>
+
+<section id="finalScreen" style="display:none">
+  <div class="panel">
+    <h1 class="finalTitle">MISIÓN CUMPLIDA</h1>
+    <h2 style="text-align:center">EL LOTE HA SIDO SALVADO</h2>
+    <p style="text-align:center">Pero el verdadero desafío comienza ahora...</p>
+
+    <div class="scoreGrid">
+      <div class="scoreCard"><b>GRUPO</b><br><span id="finalGroup"></span></div>
+      <div class="scoreCard"><b>PUNTAJE AMFE</b><br><span id="finalScore"></span>/100 (<span id="finalPct"></span>%)</div>
+      <div class="scoreCard"><b>PERFIL AMFE DEL EQUIPO</b><br><span id="finalProfile"></span></div>
+      <div class="scoreCard"><b>Q-COINS TOTALES</b><br><span id="finalChips"></span></div>
+    </div>
+
+    <h3>DESEMPEÑO POR CATEGORÍA</h3>
+    <div class="scoreGrid" id="categoryGrid"></div>
+
+    <h3>INSIGNIAS</h3>
+    <div class="badges" id="finalBadges"></div>
+
+    <div class="ranking" id="finalRanking"></div>
+
+    <div class="notice">
+      <b>APLIQUEN ESTE RAZONAMIENTO AL PROCESO ASIGNADO A SU GRUPO.</b>
+      <div class="chain">PROCESO/FUNCIÓN ↓ MODO DE FALLA / RIESGO ↓ EFECTO ↓ CAUSA ↓ CONTROLES ACTUALES ↓ S – O – D ↓ IPR ↓ ACCIÓN</div>
+      <b>PRIMERO ENTENDÉ EL PROCESO. DESPUÉS IDENTIFICÁ SUS RIESGOS Y RECIÉN ENTONCES CALCULÁ EL IPR.</b>
+    </div>
+
+    <h3>REFLEXIÓN FINAL DEL EQUIPO</h3>
+    <div class="reflections">
+      <label>1. Mencionen un ejemplo en el cual inicialmente hayan confundido modo de falla/riesgo, efecto o causa, o expliquen cómo lograron diferenciarlos.
+        <textarea id="r2" rows="3"></textarea>
+      </label>
+      <label>2. ¿Consideran que el mayor IPR siempre debería ser el primer riesgo a tratar? Justifiquen.
+        <textarea id="r4" rows="3"></textarea>
+      </label>
+      <label>3. ¿Qué idea aprendida en este juego aplicarán al AMFE que deben realizar posteriormente?
+        <textarea id="r5" rows="3"></textarea>
+      </label>
+    </div>
+
+    <div class="settings">
+      <button class="bigbtn" id="copyBtn">📋 COPIAR TEXTO + GENERAR IMAGEN PARA MOODLE</button>
+      <button class="smallbtn" id="imageBtn">🖼️ DESCARGAR IMAGEN DE RESULTADOS</button>
+      <button class="smallbtn" id="restartBtn">↻ JUGAR DE NUEVO</button>
+    </div>
+    <div class="copymsg" id="copyMsg">RESULTADO COPIADO Y FICHA PNG GENERADA. Pueden pegar el texto en Moodle y adjuntar la imagen descargada.</div>
+  </div>
+</section>
+
+<script>
+"use strict";
+
+/* =========================================================
+   MISIÓN AMFE — videojuego 2D autocontenido
+   Identidad visual, personajes, sonidos y música originales.
+   ========================================================= */
+
+const $ = s => document.querySelector(s);
+const canvas = $("#gameCanvas");
+const ctx = canvas.getContext("2d");
+ctx.imageSmoothingEnabled = false;
+
+const W = canvas.width, H = canvas.height;
+const GROUND_Y = 470;
+let worldW = 3200;
+
+let groupName = "";
+let gameStarted = false;
+let paused = false;
+let challengeOpen = false;
+let levelTransition = false;
+let levelIndex = 0;
+let levelStartTime = 0;
+let totalStartTime = 0;
+let animationId = null;
+let lastTime = performance.now();
+let cameraX = 0;
+let shake = 0;
+let flash = 0;
+
+const keys = {left:false,right:false,run:false,jump:false,use:false};
+const prevKeys = {...keys};
+
+const COIN_GOAL = 15;
+const LEVEL_TIME_LIMIT = 45; // segundos por nivel
+
+let levelDeadline = 0;
+let levelTimerActive = false;
+let levelTimeoutHandled = false;
+let pauseStartedAt = 0;
+
+const state = {
+  score: 0,
+  chips: 0,          // Q-Coins totales de toda la partida
+  levelCoins: 0,     // Q-Coins obtenidas en el nivel actual
+  hearts: 3,
+  badges: [],
+  completed: new Set(),
+  learned: new Set(),
+  attempts: {},
+  category: {conceptos:0, controles:0, sod:0, ipr:0, acciones:0, final:0}
+};
+
+const RANKING_KEY = "amfe-zombie-ranking-v1";
+
+function readRanking(){
+  try{
+    const data=JSON.parse(localStorage.getItem(RANKING_KEY)||"[]");
+    return Array.isArray(data)?data:[];
+  }catch(e){ return []; }
+}
+
+function saveGroupScore(){
+  const ranking=readRanking();
+  const normalized=groupName.trim().toLocaleLowerCase("es");
+  const previous=ranking.findIndex(row=>row.normalized===normalized);
+  const result={group:groupName,normalized,score:state.score,chips:state.chips,date:new Date().toISOString()};
+  if(previous<0) ranking.push(result);
+  else if(state.score>ranking[previous].score || (state.score===ranking[previous].score && state.chips>ranking[previous].chips)) ranking[previous]=result;
+  localStorage.setItem(RANKING_KEY,JSON.stringify(ranking));
+}
+
+function renderRanking(target){
+  const box=$(target);
+  if(!box)return;
+  const ranking=readRanking().sort((a,b)=>b.score-a.score||b.chips-a.chips||a.group.localeCompare(b.group,"es"));
+  box.innerHTML=`<h3>🏆 RANKING DE GRUPOS</h3>`+(ranking.length
+    ? `<table class="rankingTable"><thead><tr><th>#</th><th>GRUPO</th><th>PTS</th><th>Q-COINS</th></tr></thead><tbody>${ranking.map((r,i)=>`<tr><td>${i+1}</td><td></td><td>${r.score}</td><td>${r.chips}</td></tr>`).join("")}</tbody></table>`
+    : `<p class="rankingEmpty">Todavía no hay resultados guardados en este navegador.</p>`);
+  ranking.forEach((r,i)=>{ const cell=box.querySelectorAll("tbody tr")[i]?.children[1]; if(cell)cell.textContent=r.group; });
+}
+
+const player = {
+  x: 120, y: 380, w: 28, h: 38, vx:0, vy:0,
+  facing:1, grounded:false, coyote:0, jumpBuffer:0,
+  inv:0, checkpointX:120, anim:0
+};
+
+let platforms = [];
+let enemies = [];
+let collectibles = [];
+let knowledgeCapsules = [];
+let terminals = [];
+let particles = [];
+let hazards = [];
+let exitGate = {x:3000,y:350,w:70,h:120};
+let boss = null;
+let arenaWave = 0;
+
+const levelMeta = [
+  {
+    name:"NIVEL 1", title:"RIESGOS EN LA NUTRITIVA", badge:"🏆 CAZADOR DE CAUSAS",
+    mode:"scroll", world:3200,
+    objective:"Recorré la planta y diferenciá PROCESO/FUNCIÓN, MODO DE FALLA / RIESGO, EFECTO y CAUSA.",
+    mechanic:"Plataformas clásico: recorré máquinas, saltá huecos y evitá operarios-zombi."
+  },
+  {
+    name:"NIVEL 2", title:"CINTAS EN CUARENTENA", badge:"🛡️ GUARDIÁN DE LA PREVENCIÓN",
+    mode:"conveyor", world:2700,
+    objective:"Diferenciá CONTROLES PREVENTIVOS y CONTROLES DE DETECCIÓN, siempre considerando los controles actuales del proceso.",
+    mechanic:"Las cintas transportadoras te empujan: usá su movimiento, saltá derrames y alcanzá los paneles de control."
+  },
+  {
+    name:"NIVEL 3", title:"LABORATORIO S-O-D", badge:"🔎 DETECTOR EXPERTO",
+    mode:"arena", world:960,
+    objective:"Interpretá SEVERIDAD, OCURRENCIA y NO DETECCIÓN usando los criterios del AMFE de la cátedra.",
+    mechanic:"Arena cerrada: no hay recorrido largo. Activar cada terminal libera una nueva oleada de zombis."
+  },
+  {
+    name:"NIVEL 4", title:"SALA DE CONTENCIÓN IPR", badge:"⚙️ INGENIERO DE MEJORA",
+    mode:"containment", world:1450,
+    objective:"Restablecé el sistema central: calculá IPR y elegí acciones de mejora coherentes.",
+    mechanic:"Zona compacta de reactores y paneles: conseguí recursos, analizá riesgos y abrí la cámara del jefe final."
+  }
+];
+
+const lessonSets = [
+  [
+    {title:"PROCESO / FUNCIÓN", text:"Antes de identificar riesgos, definí qué debe lograr el proceso. Esa función permite analizar qué puede impedir su cumplimiento."},
+    {title:"MODO DE FALLA / RIESGO", text:"En esta actividad, MODO DE FALLA se trabaja como el RIESGO IDENTIFICADO EN EL PROCESO: una situación no deseada que puede impedir que cumpla correctamente su función."},
+    {title:"EFECTO Y CAUSA", text:"EFECTO = consecuencia si el riesgo se materializa. CAUSA = por qué puede ocurrir ese riesgo. No son lo mismo."}
+  ],
+  [
+    {title:"CONTROL PREVENTIVO", text:"Un control preventivo intenta evitar la causa o reducir su Ocurrencia (O)."},
+    {title:"CONTROL DE DETECCIÓN", text:"Un control de detección busca descubrir el modo de falla/riesgo o su causa antes de que avance hacia la etapa siguiente o el cliente."},
+    {title:"NO DETECCIÓN (D)", text:"D funciona en escala inversa: D BAJA = alta capacidad de detección. D ALTA = baja capacidad de detección. Si no existe ningún control del proceso, según la tabla de la cátedra corresponde D = 10."}
+  ],
+  [
+    {title:"SEVERIDAD (S)", text:"S se asigna según la gravedad del EFECTO si el modo de falla/riesgo ocurre. No depende de la frecuencia."},
+    {title:"OCURRENCIA (O)", text:"O representa la probabilidad o frecuencia con la que puede ocurrir la CAUSA. Si no hay datos históricos, el grupo debe justificar el supuesto utilizado."},
+    {title:"NO DETECCIÓN (D)", text:"D representa qué tan probable es que los CONTROLES ACTUALES no detecten el modo de falla/riesgo o su causa. Sin controles existentes: D = 10."}
+  ],
+  [
+    {title:"IPR", text:"IPR = S × O × D. Se calcula para cada modo de falla/riesgo y ayuda a priorizar, pero no reemplaza el análisis."},
+    {title:"MISMO IPR ≠ MISMO RIESGO", text:"Dos riesgos pueden tener el mismo IPR con combinaciones muy distintas de S, O y D."},
+    {title:"ACCIÓN DE MEJORA", text:"Una acción puede actuar sobre la causa para bajar O o mejorar los controles de detección para bajar D. La Severidad normalmente no cambia si el efecto potencial sigue siendo el mismo."}
+  ]
+];
+
+
+/* -------------------------- CHALLENGES -------------------------- */
+const challenges = [
+  // Nivel 1 — 25
+  {
+    id:"c1", level:0, pts:9, cat:"conceptos", kind:"classify",
+    title:"Terminal 01 — Producción",
+    context:"PROCESO: Producción. FUNCIÓN: elaborar harina cumpliendo los requisitos establecidos.",
+    cards:[
+      ["Elaboración de harina fuera de especificación","MODO DE FALLA / RIESGO"],
+      ["Rechazo, reproceso o insatisfacción del cliente","EFECTO"],
+      ["Parámetros de molienda incorrectos","CAUSA"]
+    ],
+    bins:["MODO DE FALLA / RIESGO","EFECTO","CAUSA"],
+    hint:"Usen la secuencia: ¿qué riesgo puede impedir que el proceso cumpla su función? = MODO DE FALLA/RIESGO · ¿qué consecuencia genera? = EFECTO · ¿por qué puede ocurrir? = CAUSA.",
+    explain:"En esta actividad, «elaboración de harina fuera de especificación» es el modo de falla/riesgo del proceso; el rechazo o reproceso es el efecto; los parámetros de molienda incorrectos son una causa posible."
+  },
+  {
+    id:"c2", level:0, pts:8, cat:"conceptos", kind:"classify",
+    title:"Terminal 02 — Almacenamiento",
+    context:"PROCESO: Almacenamiento y Conservación. FUNCIÓN: preservar materias primas y productos en condiciones adecuadas.",
+    cards:[
+      ["Deterioro del producto durante el almacenamiento","MODO DE FALLA / RIESGO"],
+      ["Pérdida, descarte o producto no conforme","EFECTO"],
+      ["Condiciones de conservación inadecuadas","CAUSA"]
+    ],
+    bins:["MODO DE FALLA / RIESGO","EFECTO","CAUSA"],
+    hint:"No confundan el riesgo identificado con su consecuencia ni con la razón por la cual puede ocurrir.",
+    explain:"El deterioro durante el almacenamiento es el modo de falla/riesgo; la pérdida o descarte es el efecto; las condiciones de conservación inadecuadas son una causa posible."
+  },
+  {
+    id:"c3", level:0, pts:8, cat:"conceptos", kind:"sequence",
+    title:"Terminal 03 — Reconstrucción de falla",
+    context:"Ordená la lógica de análisis antes de entrar a la siguiente zona.",
+    sequence:["PROCESO/FUNCIÓN","MODO DE FALLA / RIESGO","EFECTO","CAUSA"],
+    start:["CAUSA","PROCESO/FUNCIÓN","EFECTO","MODO DE FALLA / RIESGO"],
+    hint:"Primero entendemos el proceso y su función. Después identificamos el riesgo/modo de falla, su efecto y sus causas.",
+    explain:"El análisis comienza comprendiendo el proceso y su función. A partir de allí se identifica el modo de falla/riesgo, sus efectos y sus causas."
+  },
+
+  // Nivel 2 — 15
+  {
+    id:"c4", level:1, pts:5, cat:"controles", kind:"classify2",
+    title:"Terminal 04 — Banco de controles",
+    context:"Clasificá cada control según su función principal en este caso.",
+    cards:[
+      ["Mantenimiento preventivo del molino","PREVENCIÓN"],
+      ["Control del producto para detectar desvíos de especificación","DETECCIÓN"],
+      ["Especificaciones obligatorias para la compra de trigo","PREVENCIÓN"],
+      ["Control periódico de stock físico vs. registrado","DETECCIÓN"]
+    ],
+    bins:["PREVENCIÓN","DETECCIÓN"],
+    hint:"Prevención intenta evitar la causa o reducir su ocurrencia. Detección intenta descubrir el problema antes de que escape.",
+    explain:"Los controles preventivos buscan evitar o reducir la causa; los controles de detección buscan descubrir el modo de falla/riesgo o su causa antes de que avance."
+  },
+  {
+    id:"c5", level:1, pts:5, cat:"controles", kind:"choice",
+    title:"Terminal 05 — Escáner de salida",
+    context:"CONTROL A: revisión manual y periódica. CONTROL B: control automático y continuo que detecta el desvío y detiene el proceso.",
+    question:"¿Cuál debería producir una MENOR No Detección (D), si funciona como se describe?",
+    options:[
+      ["Control A",false],
+      ["Control B",true],
+      ["Ambos necesariamente producen la misma D",false]
+    ],
+    hint:"D baja significa buena capacidad de detección. Pregunten cuál tiene más probabilidad de descubrir la falla antes de que avance.",
+    explain:"Un control automático y continuo tiene mayor capacidad de detección que una revisión manual y periódica. Por eso se asocia con una No Detección (D) menor."
+  },
+  {
+    id:"c6", level:1, pts:5, cat:"controles", kind:"choice",
+    title:"Terminal 06 — Control actual vs. acción",
+    context:"En el AMFE actual no se indica un control específico. El equipo propone incorporar un control automático el mes próximo.",
+    question:"¿Cómo debe registrarse hoy ese control propuesto?",
+    options:[
+      ["Como control existente, porque ya fue decidido",false],
+      ["Como acción recomendada; todavía no es un control actual",true],
+      ["No debe aparecer en ninguna parte del AMFE",false]
+    ],
+    hint:"Separá lo que ya controla hoy el proceso de lo que todavía es una mejora propuesta.",
+    explain:"Una acción propuesta todavía no forma parte de los controles actuales. Para valorar D se consideran los controles que existen hoy; luego se registran las acciones recomendadas."
+  },
+
+  // Nivel 3 — 25
+  {
+    id:"c7", level:2, pts:9, cat:"sod", kind:"choice",
+    title:"Terminal 07 — Cámara de severidad",
+    context:"Una falla ocurre muy pocas veces, pero si ocurre puede afectar seriamente al consumidor.",
+    question:"¿Qué índice refleja principalmente la GRAVEDAD de esa consecuencia?",
+    options:[["S — Severidad",true],["O — Ocurrencia",false],["D — No Detección",false]],
+    hint:"No mires cuántas veces ocurre. Mirá qué tan grave es el EFECTO.",
+    explain:"La Severidad se relaciona con la gravedad del efecto. La frecuencia corresponde a Ocurrencia."
+  },
+  {
+    id:"c8", level:2, pts:8, cat:"sod", kind:"choice",
+    title:"Terminal 08 — Cámara de ocurrencia",
+    context:"Una causa aparece frecuentemente, aunque el efecto asociado es leve.",
+    question:"¿Qué índice debería aumentar principalmente?",
+    options:[["S — Severidad",false],["O — Ocurrencia",true],["D — No Detección",false]],
+    hint:"La palabra clave es «frecuentemente»: el índice debe representar la probabilidad/frecuencia de la CAUSA.",
+    explain:"Ocurrencia representa qué tan probable es que ocurra la causa. Una frecuencia alta no vuelve automáticamente severo al efecto."
+  },
+  {
+    id:"c9", level:2, pts:8, cat:"sod", kind:"choice",
+    title:"Terminal 09 — Cámara de detección",
+    context:"El caso no indica ningún control existente para detectar el modo de falla/riesgo o su causa.",
+    question:"Según la tabla de la cátedra, ¿qué valor corresponde a No Detección (D)?",
+    options:[["D = 10",true],["D = 1",false],["D = 5 automáticamente",false]],
+    hint:"Si actualmente no hay controles del proceso, no se puede detectar o no se analiza, la tabla de la cátedra asigna el valor máximo de D.",
+    explain:"Sin controles actuales, la posibilidad de no detectar el problema es máxima: corresponde D = 10. Si se incorporan controles eficaces, D puede disminuir."
+  },
+
+  // Nivel 4 — 25 = IPR 10 + acciones 15
+  {
+    id:"c10", level:3, pts:10, cat:"ipr", kind:"number",
+    title:"Terminal 10 — Máquina IPR",
+    context:"Para un riesgo del proceso se justificó S = 8 · O = 4 · D = 10 porque no existe control actual.",
+    question:"Ingresá el IPR correcto.",
+    factors:[8,4,10], answer:320,
+    hint:"IPR = S × O × D. No suma: multiplica los tres índices.",
+    explain:"8 × 4 × 10 = 320. El IPR ayuda a priorizar, pero no representa «320 unidades de riesgo»."
+  },
+  {
+    id:"c11", level:3, pts:8, cat:"acciones", kind:"choice",
+    title:"Terminal 11 — Presupuesto de mejora",
+    context:"Riesgo: producto fuera de especificación. Acción A: incorporar control automático de parámetros (80). Acción B: mejorar mantenimiento preventivo del equipo (60).",
+    question:"¿Qué afirmación describe mejor el efecto esperado de esas acciones?",
+    options:[
+      ["El control automático actúa principalmente sobre D y el mantenimiento principalmente sobre O",true],
+      ["Ambas reducen directamente S",false],
+      ["El mantenimiento sólo mejora D y el sensor sólo reduce S",false]
+    ],
+    hint:"Pensá qué cambia cada acción: ¿evita que aparezca la causa o mejora la posibilidad de detectar la falla?",
+    explain:"El control automático mejora principalmente la capacidad de detección, por lo que puede reducir D. El mantenimiento actúa sobre una causa y puede reducir O. Normalmente ninguna cambia la gravedad intrínseca del efecto."
+  },
+  {
+    id:"c12", level:3, pts:7, cat:"acciones", kind:"choice",
+    title:"Terminal 12 — Robustez de acción",
+    context:"Se busca reducir la recurrencia de un modo de falla/riesgo originado por una causa repetitiva del proceso.",
+    question:"¿Cuál enfoque es más robusto como primera línea de mejora?",
+    options:[
+      ["Agregar un cartel que diga «REVISAR»",false],
+      ["Actuar sobre la causa mediante mejora del proceso/mantenimiento y complementar con controles de detección",true],
+      ["Agregar inspecciones manuales sin analizar la causa",false]
+    ],
+    hint:"Una acción robusta intenta reducir la ocurrencia de la causa; la inspección puede complementar, pero no reemplaza el análisis causal.",
+    explain:"Actuar sobre la causa busca reducir Ocurrencia. Mejorar los controles de detección busca reducir No Detección. Ambas estrategias pueden complementarse."
+  },
+
+  // Final — 10
+  {
+    id:"boss", level:4, pts:10, cat:"final", kind:"choice",
+    title:"JEFE FINAL — ZOMBIE IPR",
+    context:"RIESGO A: S=2, O=10, D=4 → IPR=80.  RIESGO B: S=10, O=2, D=4 → IPR=80.",
+    question:"Ambos tienen el mismo IPR. ¿Significa que representan exactamente el mismo riesgo?",
+    options:[
+      ["Sí. Si el IPR es igual, el riesgo es equivalente",false],
+      ["No. La composición es distinta y una Severidad 10 merece especial consideración",true],
+      ["Sólo importa cuál ocurre más veces",false]
+    ],
+    hint:"El producto S×O×D puede ser igual con combinaciones muy diferentes. Mirá especialmente la severidad del efecto.",
+    explain:"EL IPR AYUDA A PRIORIZAR, PERO NO REEMPLAZA EL ANÁLISIS. Dos IPR iguales pueden ocultar situaciones diferentes y una Severidad elevada merece consideración especial."
+  }
+];
+
+/* -------------------------- LEVEL BUILD -------------------------- */
+function addCoinsOnSurface(surface, count, margin=45, yOffset=27){
+  const usable=Math.max(1,surface.w-margin*2);
+  for(let i=0;i<count;i++){
+    const x=surface.x+margin+(count===1?usable/2:(usable*i/(count-1)));
+    collectibles.push({
+      x, y:surface.y-yOffset, r:8, taken:false,
+      phase:(collectibles.length*.41)%6.2, value:1
+    });
+  }
+}
+
+function addArcCoins(x1, ySurface, count=5, span=150, height=55){
+  for(let i=0;i<count;i++){
+    const u=count===1?.5:i/(count-1);
+    const y=ySurface-28-Math.sin(Math.PI*u)*height;
+    collectibles.push({
+      x:x1+u*span, y, r:8, taken:false,
+      phase:(collectibles.length*.43)%6.2, value:1
+    });
+  }
+}
+
+function makeEnemy(x, min, max, speed=48){
+  return {x,y:GROUND_Y-32,w:28,h:32,vx:speed,min,max,alive:true,phase:Math.random()*6};
+}
+
+function buildLevel(idx){
+  state.levelCoins=0;
+  worldW=levelMeta[idx].world;
+  platforms=[];
+  enemies=[];
+  collectibles=[];
+  knowledgeCapsules=[];
+  terminals=[];
+  hazards=[];
+  arenaWave=0;
+
+  const levelCh=challenges.filter(c=>c.level===idx);
+
+  if(idx===0){
+    // LÍNEA DE EMBOTELLADO — plataformas tradicional.
+    platforms=[
+      {x:0,y:470,w:560,h:70},{x:625,y:470,w:510,h:70},{x:1200,y:470,w:430,h:70},
+      {x:1700,y:470,w:500,h:70},{x:2270,y:470,w:420,h:70},{x:2760,y:470,w:440,h:70},
+      {x:300,y:390,w:170,h:22},{x:720,y:365,w:165,h:22},{x:980,y:320,w:150,h:22},
+      {x:1340,y:375,w:160,h:22},{x:1810,y:350,w:150,h:22},{x:2080,y:305,w:150,h:22},
+      {x:2370,y:370,w:175,h:22},{x:2825,y:335,w:170,h:22}
+    ];
+    terminals=[
+      {x:760,y:301,w:34,h:64,id:levelCh[0].id,done:state.completed.has(levelCh[0].id),pulse:0},
+      {x:1775,y:406,w:34,h:64,id:levelCh[1].id,done:state.completed.has(levelCh[1].id),pulse:1},
+      {x:2870,y:271,w:34,h:64,id:levelCh[2].id,done:state.completed.has(levelCh[2].id),pulse:2}
+    ];
+    enemies=[
+      makeEnemy(480,390,540,52),makeEnemy(930,850,1110,-55),
+      makeEnemy(1510,1380,1600,52),makeEnemy(1980,1840,2160,-58),
+      makeEnemy(2510,2380,2660,56),makeEnemy(3040,2920,3160,-60)
+    ];
+    // Monedas siempre sobre superficies alcanzables.
+    [platforms[0],platforms[1],platforms[2],platforms[3],platforms[4],platforms[5]].forEach(p=>addCoinsOnSurface(p,3));
+    addCoinsOnSurface(platforms[6],2); addCoinsOnSurface(platforms[8],2); addCoinsOnSurface(platforms[10],2); addCoinsOnSurface(platforms[13],2);
+
+    // Arcos-guía: además de dar monedas, muestran la trayectoria de salto
+    // hacia las plataformas que contienen terminales o cápsulas.
+    addArcCoins(250,470,5,190,72);   // subida inicial
+    addArcCoins(675,470,5,190,82);   // Terminal 01
+    addArcCoins(945,365,4,150,25);   // plataforma intermedia
+    addArcCoins(1295,470,5,190,72);  // sector central
+    addArcCoins(1765,470,5,190,88);  // cápsula / pasarela
+    addArcCoins(2325,470,5,190,78);  // sector previo al final
+    addArcCoins(2775,470,6,190,108); // Terminal 03 de la captura
+    exitGate={x:3110,y:352,w:72,h:118};
+
+    const capSurfaces=[platforms[6],platforms[9],platforms[13]];
+    knowledgeCapsules=lessonSets[idx].map((lesson,i)=>({
+      id:`L${idx}-${i}`,x:capSurfaces[i].x+capSurfaces[i].w/2,y:capSurfaces[i].y-42,w:22,h:26,
+      taken:state.learned.has(`L${idx}-${i}`),phase:i*2.1,lesson
+    }));
+  }
+
+  if(idx===1){
+    // CINTAS EN CUARENTENA — las plataformas principales empujan.
+    platforms=[
+      {x:0,y:470,w:650,h:70,conveyor:70},{x:650,y:470,w:620,h:70,conveyor:-55},
+      {x:1270,y:470,w:650,h:70,conveyor:85},{x:1920,y:470,w:500,h:70,conveyor:-65},
+      {x:2420,y:470,w:280,h:70,conveyor:90},
+      {x:250,y:360,w:160,h:22},{x:760,y:330,w:170,h:22},{x:1120,y:285,w:150,h:22},
+      {x:1480,y:355,w:170,h:22},{x:2010,y:320,w:160,h:22},{x:2290,y:275,w:150,h:22}
+    ];
+    terminals=[
+      {x:315,y:296,w:34,h:64,id:levelCh[0].id,done:state.completed.has(levelCh[0].id),pulse:0},
+      {x:1505,y:291,w:34,h:64,id:levelCh[1].id,done:state.completed.has(levelCh[1].id),pulse:1},
+      {x:2325,y:211,w:34,h:64,id:levelCh[2].id,done:state.completed.has(levelCh[2].id),pulse:2}
+    ];
+    hazards=[
+      {x:555,y:451,w:70,h:19,type:"spill"},
+      {x:1185,y:451,w:65,h:19,type:"spill"},
+      {x:1845,y:451,w:70,h:19,type:"spill"},
+      {x:2380,y:451,w:40,h:19,type:"spill"}
+    ];
+    enemies=[
+      makeEnemy(520,430,620,-60),makeEnemy(1030,930,1220,58),
+      makeEnemy(1410,1320,1600,65),makeEnemy(2150,2010,2330,-64),
+      makeEnemy(2560,2470,2650,70)
+    ];
+    // Monedas en las cintas y plataformas. Todas están a 27 px de la superficie.
+    platforms.slice(0,5).forEach(p=>addCoinsOnSurface(p,4,70));
+    [platforms[5],platforms[6],platforms[8],platforms[9]].forEach(p=>addCoinsOnSurface(p,2,35));
+
+    // Rutas de ascenso visibles entre las cintas y los paneles.
+    addArcCoins(205,470,5,190,88);
+    addArcCoins(710,470,5,190,108);
+    addArcCoins(1010,330,4,150,20);
+    addArcCoins(1435,470,5,190,92);
+    addArcCoins(1965,470,5,190,120);
+    addArcCoins(2160,320,5,170,34);
+    exitGate={x:2605,y:352,w:72,h:118};
+
+    const capSurfaces=[platforms[5],platforms[8],platforms[10]];
+    knowledgeCapsules=lessonSets[idx].map((lesson,i)=>({
+      id:`L${idx}-${i}`,x:capSurfaces[i].x+capSurfaces[i].w/2,y:capSurfaces[i].y-42,w:22,h:26,
+      taken:state.learned.has(`L${idx}-${i}`),phase:i*2.1,lesson
+    }));
+  }
+
+  if(idx===2){
+    // LABORATORIO S-O-D — arena de una sola pantalla.
+    platforms=[
+      {x:0,y:470,w:960,h:70},
+      {x:90,y:365,w:180,h:22},{x:390,y:310,w:180,h:22},{x:690,y:365,w:180,h:22},
+      {x:245,y:225,w:150,h:20},{x:565,y:225,w:150,h:20}
+    ];
+    terminals=[
+      {x:145,y:301,w:34,h:64,id:levelCh[0].id,done:state.completed.has(levelCh[0].id),pulse:0},
+      {x:463,y:246,w:34,h:64,id:levelCh[1].id,done:state.completed.has(levelCh[1].id),pulse:1},
+      {x:745,y:301,w:34,h:64,id:levelCh[2].id,done:state.completed.has(levelCh[2].id),pulse:2}
+    ];
+    enemies=[
+      makeEnemy(300,250,430,60),makeEnemy(610,520,700,-62),makeEnemy(820,735,900,-58)
+    ];
+    addCoinsOnSurface(platforms[0],7,80);
+    addCoinsOnSurface(platforms[1],2,35);
+    addCoinsOnSurface(platforms[2],2,35);
+    addCoinsOnSurface(platforms[3],2,35);
+    addCoinsOnSurface(platforms[4],2,30);
+    addCoinsOnSurface(platforms[5],2,30);
+
+    // En la arena, las monedas dibujan las dos rutas hacia el nivel superior.
+    addArcCoins(65,470,5,200,88);
+    addArcCoins(260,365,5,165,70);
+    addArcCoins(535,310,5,165,62);
+    addArcCoins(665,470,5,200,88);
+    exitGate={x:875,y:352,w:72,h:118};
+    knowledgeCapsules=lessonSets[idx].map((lesson,i)=>{
+      const p=[platforms[4],platforms[2],platforms[5]][i];
+      return {id:`L${idx}-${i}`,x:p.x+p.w/2,y:p.y-42,w:22,h:26,
+        taken:state.learned.has(`L${idx}-${i}`),phase:i*2.1,lesson};
+    });
+  }
+
+  if(idx===3){
+    // SALA DE CONTENCIÓN — compacta, reactores y pasarelas.
+    platforms=[
+      {x:0,y:470,w:1450,h:70},
+      {x:120,y:365,w:180,h:22},{x:390,y:295,w:180,h:22},{x:670,y:365,w:180,h:22},
+      {x:950,y:295,w:180,h:22},{x:1190,y:365,w:160,h:22}
+    ];
+    terminals=[
+      {x:185,y:301,w:34,h:64,id:levelCh[0].id,done:state.completed.has(levelCh[0].id),pulse:0},
+      {x:738,y:301,w:34,h:64,id:levelCh[1].id,done:state.completed.has(levelCh[1].id),pulse:1},
+      {x:1008,y:231,w:34,h:64,id:levelCh[2].id,done:state.completed.has(levelCh[2].id),pulse:2}
+    ];
+    hazards=[
+      {x:315,y:451,w:55,h:19,type:"acid"},
+      {x:875,y:451,w:55,h:19,type:"acid"},
+      {x:1135,y:451,w:42,h:19,type:"acid"}
+    ];
+    enemies=[
+      makeEnemy(350,300,500,65),makeEnemy(620,540,780,-62),
+      makeEnemy(900,820,1030,65),makeEnemy(1260,1180,1370,-68)
+    ];
+    addCoinsOnSurface(platforms[0],7,75);
+    platforms.slice(1).forEach(p=>addCoinsOnSurface(p,2,35));
+
+    // Escalones de monedas hacia cada consola de contención.
+    addArcCoins(80,470,5,190,88);
+    addArcCoins(305,365,5,160,66);
+    addArcCoins(625,470,5,190,88);
+    addArcCoins(850,365,5,160,66);
+    addArcCoins(1140,470,5,180,85);
+    exitGate={x:1360,y:352,w:72,h:118};
+    knowledgeCapsules=lessonSets[idx].map((lesson,i)=>{
+      const p=[platforms[1],platforms[3],platforms[5]][i];
+      return {id:`L${idx}-${i}`,x:p.x+p.w/2,y:p.y-42,w:22,h:26,
+        taken:state.learned.has(`L${idx}-${i}`),phase:i*2.1,lesson};
+    });
+  }
+
+  boss=null;
+  player.x=70;player.y=380;player.vx=0;player.vy=0;player.checkpointX=70;player.inv=0;
+  cameraX=0;state.hearts=3;
+  updateHud();
+}
+
+function spawnArenaWave(){
+  if(levelIndex!==2) return;
+  arenaWave++;
+  const base=arenaWave%2===0?80:760;
+  const dir=base<400?1:-1;
+  enemies.push(makeEnemy(base,40,920,dir*(65+arenaWave*6)));
+  enemies.push(makeEnemy(base+(dir>0?45:-45),40,920,dir*(58+arenaWave*5)));
+  sfx.alarm();
+  showToast(`☣ OLEADA ${arenaWave+1}<br><small>El laboratorio sigue en cuarentena</small>`);
+}
+
+function terminalsDone(){
+  return terminals.filter(t=>t.done).length;
+}
+
+function currentChallengesDone(){
+  return terminalsDone() === terminals.length;
+}
+function enoughCoins(){
+  return state.levelCoins >= COIN_GOAL;
+}
+function exitReady(){
+  return currentChallengesDone() && enoughCoins();
+}
+
+/* -------------------------- AUDIO -------------------------- */
+let audioCtx=null, musicOn=true, sfxOn=true, musicTimer=null, musicStep=0;
+let menuMusicStep=0;
+let menuAudioStarted=false;
+
+function ensureAudio(){
+  if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  if(audioCtx.state==="suspended") return audioCtx.resume();
+  return Promise.resolve();
+}
+function tone(freq,dur=0.08,type="square",vol=0.04,when=0){
+  if(!audioCtx || !sfxOn) return;
+  const t=audioCtx.currentTime+when;
+  const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+  o.type=type;o.frequency.setValueAtTime(freq,t);
+  g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  o.connect(g);g.connect(audioCtx.destination);o.start(t);o.stop(t+dur+.02);
+}
+function noise(dur=.05,vol=.02,when=0){
+  if(!audioCtx || !sfxOn) return;
+  const len=Math.max(1,Math.floor(audioCtx.sampleRate*dur));
+  const b=audioCtx.createBuffer(1,len,audioCtx.sampleRate), d=b.getChannelData(0);
+  for(let i=0;i<len;i++) d[i]=(Math.random()*2-1)*(1-i/len);
+  const src=audioCtx.createBufferSource(), g=audioCtx.createGain();
+  src.buffer=b;g.gain.value=vol;src.connect(g);g.connect(audioCtx.destination);src.start(audioCtx.currentTime+when);
+}
+const sfx={
+  jump(){tone(330,.05,"square",.025);tone(440,.07,"square",.02,.04)},
+  coin(){tone(880,.05,"square",.025);tone(1175,.08,"square",.02,.05)},
+  good(){tone(523,.07,"square",.035);tone(659,.07,"square",.035,.07);tone(784,.12,"square",.04,.14)},
+  bad(){tone(180,.10,"sawtooth",.03);tone(130,.16,"square",.025,.08)},
+  stomp(){noise(.07,.035);tone(150,.08,"square",.03)},
+  hurt(){noise(.12,.05);tone(100,.18,"sawtooth",.04)},
+  level(){[523,659,784,1047].forEach((n,i)=>tone(n,.12,"square",.035,i*.10))},
+  alarm(){[220,165,220,165].forEach((n,i)=>tone(n,.09,"sawtooth",.025,i*.11))},
+  final(){[392,523,659,784,1047].forEach((n,i)=>tone(n,.15,"square",.04,i*.12))}
+};
+
+function playBootSequence(){
+  if(!audioCtx) return;
+  // Encendido original: barrido, confirmación y alarma corta.
+  const t=audioCtx.currentTime+.02;
+  const seq=[
+    [110,.12,"sawtooth",.055,0],
+    [165,.12,"square",.050,.10],
+    [220,.12,"square",.048,.20],
+    [330,.10,"square",.045,.30],
+    [440,.15,"square",.040,.39]
+  ];
+  seq.forEach(([f,d,type,v,delay])=>{
+    const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    o.type=type;o.frequency.setValueAtTime(f,t+delay);
+    g.gain.setValueAtTime(v,t+delay);
+    g.gain.exponentialRampToValueAtTime(.0001,t+delay+d);
+    o.connect(g);g.connect(audioCtx.destination);o.start(t+delay);o.stop(t+delay+d+.02);
+  });
+  // Doble bip de sistema.
+  [0.58,0.72].forEach((delay,i)=>{
+    const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    o.type="square";o.frequency.value=i?1046:784;
+    g.gain.setValueAtTime(.045,t+delay);g.gain.exponentialRampToValueAtTime(.0001,t+delay+.11);
+    o.connect(g);g.connect(audioCtx.destination);o.start(t+delay);o.stop(t+delay+.13);
+  });
+}
+
+// Música especial de menú: composición original retro/sci-fi.
+// Usa pulsos graves, arpegios y notas paneadas para dar sensación de alarma espacial.
+const menuLead=[330,392,494,659,494,392,349,523, 294,370,440,587,440,370,330,494];
+const menuBass=[82.4,82.4,73.4,73.4,98,98,87.3,87.3];
+const menuArp=[[165,247,330],[147,220,294],[196,294,392],[174,262,349]];
+
+function playSpatialOsc(freq,dur,type,vol,t,pan=0){
+  if(!audioCtx || !musicOn) return;
+  const o=audioCtx.createOscillator();
+  const g=audioCtx.createGain();
+  o.type=type;o.frequency.value=freq;
+  g.gain.setValueAtTime(vol,t);
+  g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+
+  if(typeof audioCtx.createStereoPanner==="function"){
+    const p=audioCtx.createStereoPanner();
+    p.pan.setValueAtTime(Math.max(-1,Math.min(1,pan)),t);
+    o.connect(g);g.connect(p);p.connect(audioCtx.destination);
+  }else{
+    o.connect(g);g.connect(audioCtx.destination);
+  }
+  o.start(t);o.stop(t+dur+.03);
+}
+
+function menuMusicTick(){
+  if(!audioCtx || !musicOn || gameStarted) return;
+  const beat=60/116/2;
+  const t=audioCtx.currentTime;
+  const step=menuMusicStep++;
+  const sweep=Math.sin(step*.58)*.78;
+
+  playSpatialOsc(menuLead[step%menuLead.length],beat*.82,"square",.030,t,sweep);
+  if(step%2===0){
+    playSpatialOsc(menuBass[(step/2)%menuBass.length],beat*1.7,"triangle",.050,t,-sweep*.45);
+  }
+
+  const chord=menuArp[Math.floor(step/8)%menuArp.length];
+  playSpatialOsc(chord[step%3]*2,beat*.5,"square",.016,t+beat*.24,-sweep);
+
+  // Pulso de "radar" y alarma grave integrada a la música.
+  if(step%8===0){
+    playSpatialOsc(660,beat*.18,"sine",.016,t+.02,.8);
+    playSpatialOsc(110,beat*.5,"sawtooth",.018,t+.03,-.2);
+  }
+  if(step%16===12){
+    playSpatialOsc(880,beat*.22,"sine",.012,t,.95);
+    playSpatialOsc(1320,beat*.14,"sine",.008,t+beat*.18,-.95);
+  }
+
+  musicNoise(.022,.005,t+beat*.08);
+  musicTimer=setTimeout(menuMusicTick,beat*1000);
+}
+
+async function startMenuMusic(withBoot=false){
+  await ensureAudio();
+  clearTimeout(musicTimer);
+  menuMusicStep=0;
+  menuAudioStarted=true;
+  if(withBoot && sfxOn) playBootSequence();
+  if(musicOn && !gameStarted){
+    // Deja respirar la secuencia de encendido antes de entrar al loop musical.
+    if(withBoot) setTimeout(()=>{ if(!gameStarted && musicOn) menuMusicTick(); },760);
+    else menuMusicTick();
+  }
+  const hint=$("#audioHint");
+  if(hint) hint.textContent="♫ Audio habilitado · música de menú activa.";
+}
+
+// Composición original: 156 BPM, melodía propia en mi menor/sol mayor.
+const melody = [659,784,880,784,659,587,659,988, 784,659,587,523,587,659,784,659,
+                698,880,988,880,784,698,659,587, 523,587,659,784,659,587,523,494];
+const bass = [165,165,196,196,147,147,196,196];
+const arp = [[330,392,494],[294,370,440],[262,330,392],[294,370,440]];
+function musicTick(){
+  if(!audioCtx || !musicOn) return;
+  const beat=60/156/2;
+  const t=audioCtx.currentTime;
+  const step=musicStep++;
+  // lead
+  playMusicOsc(melody[step%melody.length],beat*.78,"square",0.022,t);
+  // bass every 2 steps
+  if(step%2===0) playMusicOsc(bass[(step/2)%bass.length],beat*1.6,"triangle",0.035,t);
+  // arpeggio accent
+  const chord=arp[Math.floor(step/8)%arp.length];
+  playMusicOsc(chord[step%3]*2,beat*.45,"square",0.010,t+beat*.28);
+  // percussion: noise hi-hat + low kick approximation
+  musicNoise(.025,0.008,t+beat*.02);
+  if(step%4===0) playMusicOsc(75,beat*.35,"sine",0.05,t);
+  musicTimer=setTimeout(musicTick,beat*1000);
+}
+function playMusicOsc(freq,dur,type,vol,t){
+  if(!audioCtx || !musicOn) return;
+  const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+  o.type=type;o.frequency.value=freq;g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+  o.connect(g);g.connect(audioCtx.destination);o.start(t);o.stop(t+dur+.02);
+}
+function musicNoise(dur,vol,t){
+  if(!audioCtx || !musicOn)return;
+  const len=Math.floor(audioCtx.sampleRate*dur), b=audioCtx.createBuffer(1,len,audioCtx.sampleRate),d=b.getChannelData(0);
+  for(let i=0;i<len;i++) d[i]=(Math.random()*2-1)*(1-i/len);
+  const s=audioCtx.createBufferSource(),g=audioCtx.createGain();s.buffer=b;g.gain.value=vol;s.connect(g);g.connect(audioCtx.destination);s.start(t);
+}
+function startMusic(){
+  ensureAudio();
+  clearTimeout(musicTimer);
+  musicStep=0;
+  if(musicOn) musicTick();
+}
+function setMusic(on){
+  musicOn=on;
+  $("#musicBtnStart").textContent=`♫ MÚSICA MENÚ: ${on?"ON":"OFF"}`;
+  $("#musicBtnGame").textContent=`♫ ${on?"ON":"OFF"}`;
+  clearTimeout(musicTimer);
+
+  if(on){
+    if(gameStarted && !paused) startMusic();
+    else if(!gameStarted) startMenuMusic();
+  }
+
+  const hint=$("#audioHint");
+  if(hint && !on) hint.textContent="♫ Música desactivada.";
+}
+function setSfx(on){
+  sfxOn=on;
+  $("#sfxBtnStart").textContent=`🔔 Efectos: ${on?"ON":"OFF"}`;
+  $("#sfxBtnGame").textContent=`FX ${on?"ON":"OFF"}`;
+}
+
+/* -------------------------- INPUT -------------------------- */
+function isTypingTarget(target){
+  return target instanceof HTMLElement && (
+    target.matches("input, textarea, select") || target.isContentEditable
+  );
+}
+
+window.addEventListener("keydown",e=>{
+  // Si el usuario está escribiendo en un campo, no capturar letras como controles del juego.
+  if(isTypingTarget(e.target)) return;
+  if(!gameStarted) return;
+
+  const k=e.key.toLowerCase();
+  if(["arrowleft","arrowright","arrowup"," ","shift","a","d","w","e","p"].includes(k)) e.preventDefault();
+  if(k==="a"||k==="arrowleft") keys.left=true;
+  if(k==="d"||k==="arrowright") keys.right=true;
+  if(k==="shift") keys.run=true;
+  if(k==="w"||k==="arrowup"||k===" ") keys.jump=true;
+  if(k==="e") keys.use=true;
+  if(k==="p" && !challengeOpen) togglePause();
+});
+window.addEventListener("keyup",e=>{
+  if(isTypingTarget(e.target)) return;
+  if(!gameStarted) return;
+
+  const k=e.key.toLowerCase();
+  if(k==="a"||k==="arrowleft") keys.left=false;
+  if(k==="d"||k==="arrowright") keys.right=false;
+  if(k==="shift") keys.run=false;
+  if(k==="w"||k==="arrowup"||k===" ") keys.jump=false;
+  if(k==="e") keys.use=false;
+});
+document.querySelectorAll(".touchBtn").forEach(btn=>{
+  const key=btn.dataset.key;
+  const down=e=>{e.preventDefault();keys[key]=true;};
+  const up=e=>{e.preventDefault();keys[key]=false;};
+  btn.addEventListener("pointerdown",down);
+  btn.addEventListener("pointerup",up);
+  btn.addEventListener("pointercancel",up);
+  btn.addEventListener("pointerleave",up);
+});
+
+/* -------------------------- PHYSICS -------------------------- */
+function rects(a,b){return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y}
+function update(dt){
+  if(paused||challengeOpen||levelTransition) return;
+
+  // Física deliberadamente permisiva: todas las rutas obligatorias
+  // fueron diseñadas para poder alcanzarse con estos valores.
+  const WALK_SPEED=180;
+  const RUN_SPEED=285;
+  const JUMP_VELOCITY=-650;
+  const speed=keys.run?RUN_SPEED:WALK_SPEED;
+  const accel=keys.run?1350:1000;
+  const target=(keys.right?1:0)-(keys.left?1:0);
+  player.vx += (target*speed-player.vx)*Math.min(1,accel*dt/Math.max(1,speed));
+  if(!target) player.vx*=Math.pow(.0008,dt);
+  if(target) player.facing=target;
+
+  if(keys.jump && !prevKeys.jump) player.jumpBuffer=.16;
+  player.jumpBuffer=Math.max(0,player.jumpBuffer-dt);
+  // "Coyote time" un poco mayor para que el salto no exija precisión milimétrica.
+  player.coyote=player.grounded?.15:Math.max(0,player.coyote-dt);
+
+  if(player.jumpBuffer>0 && player.coyote>0){
+    player.vy=JUMP_VELOCITY;player.grounded=false;player.coyote=0;player.jumpBuffer=0;sfx.jump();
+  }
+
+  player.vy += 1180*dt;
+  if(!keys.jump && player.vy<0) player.vy += 900*dt;
+
+  // X
+  player.x += player.vx*dt;
+  player.x=Math.max(0,Math.min(worldW-player.w,player.x));
+
+  // Y collision from above
+  const oldBottom=player.y+player.h;
+  player.y += player.vy*dt;
+  player.grounded=false;
+  let standingPlatform=null;
+  for(const p of platforms){
+    if(player.x+player.w>p.x && player.x<p.x+p.w && oldBottom<=p.y+8 && player.y+player.h>=p.y && player.vy>=0){
+      player.y=p.y-player.h;player.vy=0;player.grounded=true;standingPlatform=p;
+    }
+  }
+  // En el nivel de cuarentena las cintas transportadoras empujan físicamente al jugador.
+  if(standingPlatform && standingPlatform.conveyor){
+    player.x += standingPlatform.conveyor*dt;
+    player.x=Math.max(0,Math.min(worldW-player.w,player.x));
+  }
+  if(player.y>H+120) hurtPlayer(true);
+
+  // Derrames / zonas contaminadas: se saltan como obstáculos de la línea.
+  for(const h of hazards){
+    if(rects(player,h) && player.inv<=0) hurtPlayer(false);
+  }
+
+  // enemies
+  for(const e of enemies){
+    if(!e.alive) continue;
+    e.x+=e.vx*dt;
+    if(e.x<e.min||e.x>e.max){e.vx*=-1;e.x=Math.max(e.min,Math.min(e.max,e.x));}
+    if(rects(player,e) && player.inv<=0){
+      const stomp=player.vy>80 && player.y+player.h-8 < e.y+12;
+      if(stomp){
+        e.alive=false;player.vy=-330;sfx.stomp();spawnBurst(e.x+14,e.y+14,12);
+        state.chips+=3;state.levelCoins+=3;showToast("+3 Q-COINS<br><small>OPERARIO-ZOMBI CONTENIDO</small>");updateHud();
+      } else hurtPlayer(false);
+    }
+  }
+
+  // Q-Coins
+  for(const c of collectibles){
+    if(c.taken)continue;
+    const dx=(player.x+player.w/2)-c.x,dy=(player.y+player.h/2)-c.y;
+    if(dx*dx+dy*dy<520){
+      c.taken=true;
+      state.chips+=c.value||1;
+      state.levelCoins+=c.value||1;
+      sfx.coin();spawnBurst(c.x,c.y,8);updateHud();
+      if(state.levelCoins===COIN_GOAL) showToast("🔓 CUPO DE Q-COINS COMPLETO<br><small>La salida podrá abrirse al validar las terminales</small>");
+    }
+  }
+
+  // Cápsulas AMFE: microaprendizaje integrado al recorrido.
+  for(const k of knowledgeCapsules){
+    if(k.taken)continue;
+    const box={x:k.x-12,y:k.y-14,w:k.w+24,h:k.h+28};
+    if(rects(player,box)){
+      k.taken=true;state.learned.add(k.id);state.chips+=2;state.levelCoins+=2;
+      sfx.good();spawnBurst(k.x,k.y,14);showLesson(k.lesson);updateHud();
+    }
+  }
+
+  // terminal proximity
+  let near=null;
+  for(const t of terminals){
+    t.pulse+=dt*4;
+    const expanded={x:t.x-46,y:t.y-24,w:t.w+92,h:t.h+39};
+    if(rects(player,expanded)){near=t;break;}
+  }
+  if(near && !near.done){
+    $("#prompt").style.display="block";
+    $("#prompt").textContent="E / USAR — ACTIVAR TERMINAL AMFE";
+    if(keys.use && !prevKeys.use) openChallenge(near.id);
+  } else {
+    $("#prompt").style.display="none";
+  }
+
+  // exit
+  if(rects(player,exitGate)){
+    if(exitReady()){
+      if(levelIndex<3) finishLevel();
+      else openBoss();
+    }else{
+      $("#prompt").style.display="block";
+      const faltanT=terminals.length-terminalsDone();
+      const faltanC=Math.max(0,COIN_GOAL-state.levelCoins);
+      const partes=[];
+      if(faltanT>0) partes.push(`${faltanT} TERMINAL(ES) AMFE`);
+      if(faltanC>0) partes.push(`${faltanC} Q-COIN(S)`);
+      $("#prompt").textContent=`PUERTA BLOQUEADA — FALTAN ${partes.join(" + ")}`;
+    }
+  }
+
+  player.inv=Math.max(0,player.inv-dt);
+  player.anim+=dt*(Math.abs(player.vx)>.5?(keys.run?15:10):3);
+
+  if(levelMeta[levelIndex].mode==="arena"){
+    cameraX=0;
+  }else{
+    cameraX += ((player.x-W*.42)-cameraX)*Math.min(1,dt*5);
+    cameraX=Math.max(0,Math.min(Math.max(0,worldW-W),cameraX));
+  }
+
+  particles.forEach(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=380*dt;p.life-=dt;});
+  particles=particles.filter(p=>p.life>0);
+  if(shake>0)shake=Math.max(0,shake-dt);
+  if(flash>0)flash=Math.max(0,flash-dt);
+
+  $("#progressInner").style.width=(Math.min(1,player.x/Math.max(1,worldW-200))*100).toFixed(1)+"%";
+
+  Object.assign(prevKeys,keys);
+}
+function hurtPlayer(fell){
+  if(player.inv>0)return;
+  state.hearts--;player.inv=1.8;shake=.3;flash=.15;sfx.hurt();
+  spawnBurst(player.x+player.w/2,player.y+player.h/2,18);
+  if(state.hearts<=0){
+    state.hearts=3;
+    player.x=player.checkpointX;player.y=300;player.vx=0;player.vy=0;
+    showToast("⚠️ REINICIO DE SECCIÓN<br><small>Sin penalización académica</small>");
+  }else{
+    player.x=Math.max(80,player.checkpointX);player.y=300;player.vx=0;player.vy=0;
+  }
+  updateHud();
+}
+function spawnBurst(x,y,n){
+  for(let i=0;i<n;i++) particles.push({x,y,vx:(Math.random()-.5)*220,vy:(Math.random()-.8)*220,life:.5+Math.random()*.5,s:3+Math.random()*4});
+}
+
+/* -------------------------- DRAW -------------------------- */
+function pxRect(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h))}
+function draw(){
+  ctx.save();
+  if(shake>0)ctx.translate((Math.random()-.5)*10,(Math.random()-.5)*7);
+  drawBackground();
+  ctx.save();ctx.translate(-Math.floor(cameraX),0);
+  drawFactory();
+  drawPlatforms();
+  drawHazards();
+  drawCollectibles();
+  drawKnowledgeCapsules();
+  drawTerminals();
+  drawExit();
+  drawEnemies();
+  drawParticles();
+  drawPlayer();
+  ctx.restore();
+  if(flash>0){ctx.fillStyle="#ffffff66";ctx.fillRect(0,0,W,H);}
+  ctx.restore();
+}
+function drawBackground(){
+  const t=performance.now()/1000;
+
+  if(levelIndex===0){
+    // Embotellado: azul industrial, ventanales y tuberías.
+    ctx.fillStyle="#17365b";ctx.fillRect(0,0,W,H);
+    const far=-(cameraX*.18)%220;
+    for(let x=far-220;x<W+220;x+=220){
+      pxRect(x,75,150,18,"#2d5d7e");pxRect(x+130,75,20,115,"#2d5d7e");
+      pxRect(x+126,184,28,20,"#4f809b");
+    }
+    for(let x=-(cameraX*.32)%190-190;x<W+190;x+=190){
+      pxRect(x,210,120,78,"#0b1830");pxRect(x+9,219,102,60,"#31576c");
+      pxRect(x+18,230,26,34,"#76c9d2");pxRect(x+63,230,34,34,"#e8c05a");
+    }
+  }
+
+  if(levelIndex===1){
+    // Cuarentena: depósitos, luces amarillas y franjas de advertencia.
+    ctx.fillStyle="#2f2b45";ctx.fillRect(0,0,W,H);
+    for(let x=-(cameraX*.22)%260-260;x<W+260;x+=260){
+      pxRect(x,85,210,24,"#514667");pxRect(x+20,109,18,145,"#514667");
+      pxRect(x+160,109,18,145,"#514667");
+      for(let s=0;s<5;s++)pxRect(x+s*42,260,21,14,s%2?"#171520":"#e0b743");
+    }
+    for(let x=40-(cameraX*.45)%180;x<W;x+=180){
+      pxRect(x,180,90,80,"#19162a");pxRect(x+10,190,70,18,"#8f7f4a");
+      pxRect(x+20,220,15,15,Math.sin(t*6+x)>.2?"#f4ce48":"#5d4c29");
+    }
+  }
+
+  if(levelIndex===2){
+    // Laboratorio: cámara fija, vidrio, cabinas y señales biológicas.
+    ctx.fillStyle="#103a43";ctx.fillRect(0,0,W,H);
+    pxRect(0,70,W,16,"#356c70");
+    for(let x=35;x<W;x+=190){
+      pxRect(x,105,145,130,"#0c2731");pxRect(x+8,113,129,114,"#285c63");
+      pxRect(x+18,125,43,70,"#8bcfd0");pxRect(x+78,125,42,70,"#74b6b8");
+      pxRect(x+52,200,40,12,"#d7e9d6");
+    }
+    pxRect(345,30,270,48,"#17252e");
+    ctx.fillStyle="#f3d85a";ctx.font="bold 18px Courier New";ctx.textAlign="center";
+    ctx.fillText("LAB S-O-D // CUARENTENA",480,61);
+  }
+
+  if(levelIndex===3){
+    // Contención: sala roja/oscura de reactores.
+    ctx.fillStyle="#321d2a";ctx.fillRect(0,0,W,H);
+    for(let x=40-(cameraX*.25)%250;x<W+250;x+=250){
+      pxRect(x,85,120,255,"#4c2b3a");pxRect(x+16,100,88,185,"#271923");
+      pxRect(x+30,125,60,120,"#752f42");
+      pxRect(x+38,140,44,90,Math.sin(t*4+x)>.1?"#bd4554":"#692b38");
+      pxRect(x+20,295,80,18,"#79717b");
+    }
+    for(let x=0;x<W;x+=80){pxRect(x,335,40,8,"#d1aa3f");pxRect(x+40,335,40,8,"#17131a")}
+  }
+
+  pxRect(0,390,W,150,"#101620");
+}
+
+function drawFactory(){
+  if(levelIndex===0){
+    // Botellas, llenadoras y tapadoras.
+    for(let x=120;x<worldW;x+=520){
+      pxRect(x,428,290,12,"#697481");
+      for(let r=x;r<x+290;r+=34){pxRect(r,433,24,10,"#aeb8c6")}
+      pxRect(x+90,330,75,95,"#405a72");pxRect(x+108,347,40,54,"#708da0");
+      for(let b=x+20;b<x+270;b+=52){pxRect(b,410,12,18,"#6fcdd1");pxRect(b+3,405,6,5,"#d4f0ed")}
+    }
+  } else if(levelIndex===1){
+    // Línea de producción continua.
+    for(const p of platforms.filter(p=>p.conveyor)){
+      pxRect(p.x,p.y-22,p.w,20,"#596171");
+      for(let x=p.x+8;x<p.x+p.w-10;x+=38){
+        pxRect(x,p.y-17,24,10,"#b4bec7");
+        pxRect(x+(Math.floor(performance.now()/90)%12),p.y-14,8,4,"#f0c64e");
+      }
+    }
+    for(let x=420;x<worldW;x+=620){
+      pxRect(x,280,95,145,"#4b465c");pxRect(x+18,300,58,50,"#201d2b");
+      pxRect(x+31,315,32,20,"#e3b84d");
+    }
+  } else if(levelIndex===2){
+    // Mesadas y equipos de laboratorio.
+    for(let x=65;x<900;x+=270){
+      pxRect(x,405,180,18,"#789093");pxRect(x+15,423,15,47,"#52676b");pxRect(x+150,423,15,47,"#52676b");
+      pxRect(x+45,374,25,30,"#56cad0");pxRect(x+100,362,32,42,"#d5e7d5");
+    }
+  } else {
+    // Consolas y reactores.
+    for(let x=110;x<worldW;x+=360){
+      pxRect(x,390,165,75,"#3e4450");pxRect(x+15,402,135,42,"#111925");
+      pxRect(x+25,412,28,12,"#59d1cf");pxRect(x+66,412,28,12,"#e3c34d");pxRect(x+106,412,28,12,"#d65763");
+    }
+  }
+}
+
+function drawPlatforms(){
+  const beltShift=Math.floor(performance.now()/90)%24;
+  for(const p of platforms){
+    if(p.conveyor){
+      pxRect(p.x,p.y,p.w,p.h,"#4d5362");
+      pxRect(p.x,p.y,p.w,7,"#d7b947");
+      for(let x=p.x+8;x<p.x+p.w-12;x+=32){
+        pxRect(x,p.y+14,20,6,"#262c37");
+        const arrowX=x+(p.conveyor>0?beltShift:24-beltShift)%24;
+        if(arrowX<p.x+p.w-8) pxRect(arrowX,p.y+28,8,4,"#f0cd55");
+      }
+    }else{
+      pxRect(p.x,p.y,p.w,p.h,"#5c6271");
+      pxRect(p.x,p.y,p.w,7,"#b8c2ce");
+      for(let x=p.x+8;x<p.x+p.w-10;x+=28)pxRect(x,p.y+13,14,5,"#343a48");
+    }
+  }
+}
+
+function drawHazards(){
+  for(const h of hazards){
+    const pulse=Math.sin(performance.now()/130+h.x)*2;
+    pxRect(h.x,h.y,h.w,h.h,h.type==="acid"?"#6a3d73":"#416b3c");
+    pxRect(h.x+4,h.y+4,h.w-8,5,h.type==="acid"?"#bb61ce":"#7eca5d");
+    for(let x=h.x+10;x<h.x+h.w-8;x+=18){
+      pxRect(x,h.y-3+pulse,7,5,h.type==="acid"?"#e58bf0":"#a8ea74");
+    }
+  }
+}
+
+function drawCollectibles(){
+  const t=performance.now()/180;
+  for(const c of collectibles){
+    if(c.taken)continue;
+    const bob=Math.sin(t+c.phase)*5;
+    ctx.save();ctx.translate(c.x,c.y+bob);
+    // Q-Coin pixelada con brillo.
+    pxRect(-8,-10,16,20,"#a66b22");
+    pxRect(-6,-10,12,20,"#ffd54a");
+    pxRect(-3,-7,6,14,"#fff1a3");
+    pxRect(-1,-4,2,8,"#9a6720");
+    pxRect(2,4,3,3,"#9a6720");
+    ctx.restore();
+  }
+}
+function drawKnowledgeCapsules(){
+  const t=performance.now()/220;
+  for(const k of knowledgeCapsules){
+    if(k.taken)continue;
+    const bob=Math.sin(t+k.phase)*7;
+    ctx.save();ctx.translate(k.x,k.y+bob);
+    pxRect(-11,-13,22,26,"#0b1020");
+    pxRect(-8,-10,16,20,"#4bd5d1");
+    pxRect(-5,-7,10,14,"#bff7f1");
+    ctx.fillStyle="#101525";ctx.font="bold 12px Courier New";ctx.textAlign="center";ctx.fillText("A",-0,5);
+    pxRect(-9,-15,18,3,"#ffd54a");
+    ctx.restore();
+  }
+}
+function drawTerminals(){
+  for(const t of terminals){
+    const glow=t.done?"#53d769":(Math.sin(t.pulse)>0?"#ffdd55":"#ff8d3a");
+    pxRect(t.x,t.y,t.w,t.h,"#263b52");
+    pxRect(t.x+4,t.y+5,t.w-8,20,"#0d1822");
+    pxRect(t.x+8,t.y+9,t.w-16,12,glow);
+    pxRect(t.x+5,t.y+32,9,9,"#b7c0cf");
+    pxRect(t.x+20,t.y+32,9,9,t.done?"#53d769":"#e84d5b");
+    pxRect(t.x+10,t.y+48,14,11,"#586e84");
+    if(t.done) pxRect(t.x+12,t.y-12,10,10,"#53d769");
+  }
+}
+function drawExit(){
+  const open=exitReady();
+  pxRect(exitGate.x,exitGate.y,exitGate.w,exitGate.h,"#29364b");
+  pxRect(exitGate.x+8,exitGate.y+8,exitGate.w-16,exitGate.h-8,open?"#204b3c":"#471f2c");
+  for(let y=exitGate.y+14;y<exitGate.y+exitGate.h;y+=18)pxRect(exitGate.x+12,y,exitGate.w-24,6,open?"#58d88a":"#e65d66");
+  pxRect(exitGate.x+22,exitGate.y-26,28,22,open?"#53d769":"#e84d5b");
+}
+function drawEnemies(){
+  for(const e of enemies){
+    if(!e.alive)continue;
+    const hop=Math.abs(Math.sin(performance.now()/330+e.phase))*2;
+    const face=e.vx>=0?1:-1;
+    ctx.save();
+    ctx.translate(e.x+(face<0?e.w:0),e.y-hop);ctx.scale(face,1);
+
+    // Operario-zombi original, sin gore.
+    pxRect(6,0,17,5,"#e5c34f");              // casco
+    pxRect(4,5,21,14,"#78a85f");             // cabeza
+    pxRect(7,8,4,4,"#f5f0d6");pxRect(18,8,4,4,"#ff6b63");
+    pxRect(9,10,2,2,"#15202a");pxRect(19,10,2,2,"#42151a");
+    pxRect(6,19,18,9,"#405f84");              // mameluco
+    pxRect(2,20,5,9,"#78a85f");pxRect(23,20,5,9,"#78a85f");
+    pxRect(7,28,6,4,"#293744");pxRect(18,28,6,4,"#293744");
+    ctx.restore();
+  }
+}
+function drawPlayer(){
+  if(player.inv>0 && Math.floor(player.inv*12)%2===0)return;
+  const x=player.x,y=player.y;
+  ctx.save();ctx.translate(x+(player.facing<0?player.w:0),y);ctx.scale(player.facing,1);
+  const step=Math.sin(player.anim)*3;
+  // Q-BOT original
+  pxRect(5,0,18,7,"#f3d85a");pxRect(2,7,24,18,"#5bd4d2");
+  pxRect(6,10,5,5,"#f6f2d3");pxRect(17,10,5,5,"#f6f2d3");
+  pxRect(8,12,2,2,"#101525");pxRect(18,12,2,2,"#101525");
+  pxRect(6,25,16,8,"#365f7d");pxRect(9,27,10,4,"#ffd54a");
+  pxRect(3,25+Math.max(0,step),5,10,"#86e0df");pxRect(20,25+Math.max(0,-step),5,10,"#86e0df");
+  pxRect(7,33,5,5,"#17213b");pxRect(17,33,5,5,"#17213b");
+  ctx.restore();
+}
+function drawParticles(){
+  for(const p of particles){
+    ctx.globalAlpha=Math.max(0,p.life);
+    pxRect(p.x,p.y,p.s,p.s,Math.random()>.5?"#ffd54a":"#53d769");
+  }
+  ctx.globalAlpha=1;
+}
+
+/* -------------------------- GAME LOOP -------------------------- */
+function loop(t){
+  const dt=Math.min(.033,(t-lastTime)/1000);lastTime=t;
+  updateLevelTimer(t);
+  update(dt);draw();
+  animationId=requestAnimationFrame(loop);
+}
+function updateHud(){
+  $("#hearts").textContent="♥".repeat(state.hearts)+"♡".repeat(3-state.hearts);
+  $("#score").textContent=state.score;
+  $("#chips").textContent=state.chips;
+  $("#levelCoins").textContent=state.levelCoins;
+  $("#coinGoal").textContent=COIN_GOAL;
+  $("#terminalCount").textContent=`${terminalsDone()}/${terminals.length||3}`;
+  if(levelIndex<4){
+    $("#levelTitle").innerHTML=`${levelMeta[levelIndex].name}<br>${levelMeta[levelIndex].title}<div id="progressOuter"><div id="progressInner" style="width:0%"></div></div>`;
+  }
+}
+function formatTime(sec){
+  const m=Math.floor(sec/60).toString().padStart(2,"0");
+  const s=Math.floor(sec%60).toString().padStart(2,"0");
+  return `${m}:${s}`;
+}
+function startLevelTimer(){
+  levelStartTime=performance.now();
+  levelDeadline=levelStartTime+(LEVEL_TIME_LIMIT*1000);
+  levelTimerActive=true;
+  levelTimeoutHandled=false;
+  pauseStartedAt=0;
+  const clock=$("#clock");
+  clock.textContent=formatTime(LEVEL_TIME_LIMIT);
+  clock.classList.remove("danger");
+}
+
+function stopLevelTimer(){
+  levelTimerActive=false;
+  $("#clock").classList.remove("danger");
+}
+
+function updateLevelTimer(now){
+  if(!gameStarted || !levelTimerActive || levelTimeoutHandled) return;
+  if(paused) return;
+
+  const remaining=Math.max(0,(levelDeadline-now)/1000);
+  const shown=Math.ceil(remaining);
+  const clock=$("#clock");
+  clock.textContent=formatTime(shown);
+  clock.classList.toggle("danger",remaining<=10);
+
+  if(remaining<=0){
+    handleLevelTimeout();
+  }
+}
+
+function closeTransientGameUI(){
+  challengeOpen=false;
+  activeChallenge=null;
+  $("#challengeOverlay").classList.remove("show");
+  $("#prompt").style.display="none";
+  $("#lessonBanner").classList.remove("show");
+}
+
+function handleLevelTimeout(){
+  if(levelTimeoutHandled) return;
+  levelTimeoutHandled=true;
+  stopLevelTimer();
+  closeTransientGameUI();
+  levelTransition=true;
+  sfx.alarm();
+
+  showToast(`⏱ TIEMPO AGOTADO<br><small>${levelMeta[levelIndex].name}: se pasa automáticamente al siguiente sector</small>`);
+
+  setTimeout(()=>{
+    if(levelIndex<3){
+      levelIndex++;
+      buildLevel(levelIndex);
+      updateHud();
+      showLevelSplash();
+    }else{
+      levelTransition=false;
+      $("#clock").textContent="JEFE";
+      openBoss();
+    }
+  },1200);
+}
+
+function showToast(html){
+  const el=$("#badgeToast");el.innerHTML=html;el.classList.add("show");
+  setTimeout(()=>el.classList.remove("show"),1800);
+}
+let lessonTimer=null;
+function showLesson(lesson){
+  clearTimeout(lessonTimer);
+  $("#lessonTitle").textContent=`🧠 CÁPSULA AMFE — ${lesson.title}`;
+  $("#lessonText").textContent=lesson.text;
+  $("#lessonBanner").classList.add("show");
+  lessonTimer=setTimeout(()=>$("#lessonBanner").classList.remove("show"),5200);
+}
+
+/* -------------------------- CHALLENGE UI -------------------------- */
+let activeChallenge=null;
+let selectedCard=null;
+let assignments={};
+let seqState=[];
+
+function openChallenge(id){
+  const c=challenges.find(x=>x.id===id);
+  if(!c||state.completed.has(id))return;
+  activeChallenge=c;challengeOpen=true;
+  $("#challengeOverlay").classList.add("show");
+  $("#challengeTitle").textContent=c.title;
+  $("#challengeContext").textContent=c.context;
+  $("#challengeType").textContent=({
+    classify:"CLASIFICAR",classify2:"CLASIFICAR",choice:"DECISIÓN",number:"CÁLCULO",sequence:"ORDENAR"
+  })[c.kind]||"DESAFÍO";
+  renderChallenge(c);
+}
+function renderChallenge(c){
+  const body=$("#challengeBody");body.innerHTML="";
+  assignments={};selectedCard=null;
+  if(c.kind==="choice") renderChoice(c,body);
+  if(c.kind==="number") renderNumber(c,body);
+  if(c.kind==="classify"||c.kind==="classify2") renderClassify(c,body);
+  if(c.kind==="sequence") renderSequence(c,body);
+}
+function renderChoice(c,body){
+  body.innerHTML=`<div class="question">${c.question}</div><div class="options"></div><div class="feedback" id="fb"></div>`;
+  const opts=body.querySelector(".options");
+  c.options.forEach((o,i)=>{
+    const b=document.createElement("button");b.className="optbtn";b.textContent=o[0];
+    b.onclick=()=>submitChoice(c,i,b);opts.appendChild(b);
+  });
+}
+function submitChoice(c,i,btn){
+  const correct=c.options[i][1];
+  const fb=$("#fb");
+  if(correct){
+    btn.classList.add("correct");completeChallenge(c,fb);
+  }else{
+    state.attempts[c.id]=(state.attempts[c.id]||0)+1;
+    btn.classList.add("wrong");sfx.bad();
+    fb.className="feedback show bad";
+    fb.innerHTML=`<b>⚠️ REVISÁ LA LÓGICA</b><br>${c.hint}<br><br><button class="smallbtn" id="retry">VOLVER A INTENTAR</button>`;
+    bodyDisableOptions();
+    $("#retry").onclick=()=>renderChallenge(c);
+  }
+}
+function bodyDisableOptions(){
+  document.querySelectorAll("#challengeBody .optbtn").forEach(b=>b.disabled=true);
+}
+function renderNumber(c,body){
+  const factors = Array.isArray(c.factors) && c.factors.length === 3 ? c.factors : [9,4,6];
+  const formulaText = `${factors[0]} × ${factors[1]} × ${factors[2]}`;
+  body.innerHTML=`
+    <div class="machine"><div>S × O × D</div><div class="formula">${formulaText} = ?</div></div>
+    <div class="question">${c.question}</div>
+    <input id="numAnswer" type="number" inputmode="numeric" placeholder="IPR">
+    <div style="margin-top:12px"><button class="bigbtn" id="calcBtn">ACTIVAR MÁQUINA</button></div>
+    <div class="feedback" id="fb"></div>`;
+  $("#calcBtn").onclick=()=>{
+    const v=Number($("#numAnswer").value),fb=$("#fb");
+    if(v===c.answer){
+      // animación numérica breve
+      const f=$(".formula");f.textContent=`${formulaText} = ${c.answer}`;completeChallenge(c,fb);
+    }else{
+      state.attempts[c.id]=(state.attempts[c.id]||0)+1;sfx.bad();
+      fb.className="feedback show bad";
+      fb.innerHTML=`<b>⚠️ RESULTADO NO VALIDADO</b><br>${c.hint}`;
+    }
+  };
+}
+function renderClassify(c,body){
+  body.innerHTML=`<div class="question">Seleccioná una tarjeta y después enviála al contenedor correcto.</div>
+    <div class="cardZone"><div class="cards" id="cards"></div><div class="bins" id="bins"></div>
+    <div class="assignment" id="assignment"></div></div>
+    <div style="margin-top:12px"><button class="bigbtn" id="checkClass">VALIDAR CLASIFICACIÓN</button></div>
+    <div class="feedback" id="fb"></div>`;
+  const cards=$("#cards");
+  c.cards.forEach((pair,i)=>{
+    const card=document.createElement("button");card.className="card";card.textContent=pair[0];card.dataset.i=i;
+    card.onclick=()=>{
+      selectedCard=i;document.querySelectorAll(".card").forEach(x=>x.classList.remove("selected"));card.classList.add("selected");
+    };cards.appendChild(card);
+  });
+  c.bins.forEach(bin=>{
+    const b=document.createElement("button");b.className="binbtn";b.textContent=bin;
+    b.onclick=()=>{
+      if(selectedCard===null)return;
+      assignments[selectedCard]=bin;
+      document.querySelectorAll(".card").forEach(x=>x.classList.remove("selected"));
+      selectedCard=null;renderAssignments(c);
+    };$("#bins").appendChild(b);
+  });
+  $("#checkClass").onclick=()=>{
+    const fb=$("#fb");
+    const all=c.cards.every((pair,i)=>assignments[i]===pair[1]);
+    if(all) completeChallenge(c,fb);
+    else{
+      state.attempts[c.id]=(state.attempts[c.id]||0)+1;sfx.bad();
+      fb.className="feedback show bad";
+      fb.innerHTML=`<b>⚠️ HAY AL MENOS UNA TARJETA MAL UBICADA</b><br>${c.hint}<br><br><button class="smallbtn" id="retry">REINICIAR CLASIFICACIÓN</button>`;
+      $("#retry").onclick=()=>renderChallenge(c);
+    }
+  };
+}
+function renderAssignments(c){
+  const a=$("#assignment");
+  a.innerHTML=c.cards.map((pair,i)=>`${assignments[i]? "▣":"□"} ${pair[0]} → <b>${assignments[i]||"sin asignar"}</b>`).join("<br>");
+}
+function renderSequence(c,body){
+  seqState=[...c.start];
+  body.innerHTML=`<div class="question">Reconstruí la secuencia del análisis.</div>
+    <div class="sequence" id="seq"></div>
+    <div style="margin-top:12px"><button class="bigbtn" id="checkSeq">VALIDAR SECUENCIA</button></div>
+    <div class="feedback" id="fb"></div>`;
+  const drawSeq=()=>{
+    const el=$("#seq");el.innerHTML="";
+    seqState.forEach((item,i)=>{
+      const row=document.createElement("div");row.className="seqrow";
+      row.innerHTML=`<b>${i+1}. ${item}</b><button class="smallbtn">▲</button><button class="smallbtn">▼</button>`;
+      const bs=row.querySelectorAll("button");
+      bs[0].onclick=()=>{if(i>0){[seqState[i-1],seqState[i]]=[seqState[i],seqState[i-1]];drawSeq();}};
+      bs[1].onclick=()=>{if(i<seqState.length-1){[seqState[i+1],seqState[i]]=[seqState[i],seqState[i+1]];drawSeq();}};
+      el.appendChild(row);
+    });
+  };
+  drawSeq();
+  $("#checkSeq").onclick=()=>{
+    const ok=seqState.every((v,i)=>v===c.sequence[i]),fb=$("#fb");
+    if(ok)completeChallenge(c,fb);
+    else{
+      state.attempts[c.id]=(state.attempts[c.id]||0)+1;sfx.bad();
+      fb.className="feedback show bad";fb.innerHTML=`<b>⚠️ SECUENCIA NO VALIDADA</b><br>${c.hint}`;
+    }
+  };
+}
+function completeChallenge(c,fb){
+  if(state.completed.has(c.id))return;
+  const misses=state.attempts[c.id]||0;
+  const award=Math.max(Math.ceil(c.pts*.6),c.pts-misses);
+  state.score+=award;state.category[c.cat]+=award;state.completed.add(c.id);sfx.good();
+  fb.className="feedback show good";
+  fb.innerHTML=`<b>✅ ¡RIESGO CONTROLADO! +${award} PUNTOS AMFE</b><br>${c.explain}<br><br><button class="bigbtn" id="continueGame">VOLVER A LA PLANTA</button>`;
+  $("#continueGame").onclick=()=>{
+    const t=terminals.find(x=>x.id===c.id);
+    if(t){
+      t.done=true;
+      player.checkpointX=Math.max(player.checkpointX,t.x-80);
+      if(levelIndex===2 && terminalsDone()<terminals.length) spawnArenaWave();
+    }
+    challengeOpen=false;$("#challengeOverlay").classList.remove("show");updateHud();spawnBurst(player.x+15,player.y,18);
+    showToast("✓ TERMINAL VALIDADA<br>¡FALLA DETECTADA!");
+  };
+}
+function openBoss(){
+  if(challengeOpen||state.completed.has("boss"))return;
+  stopLevelTimer();
+  levelTimeoutHandled=true;
+  $("#clock").textContent="JEFE";
+  sfx.alarm();
+  openChallenge("boss");
+  const oldComplete=$("#continueGame");
+  // completeChallenge crea el botón luego; lo interceptamos mediante observer simple en siguiente frame.
+  const watcher=setInterval(()=>{
+    const btn=$("#continueGame");
+    if(btn){
+      clearInterval(watcher);
+      btn.textContent="CONTENER AL ZOMBIE IPR";
+      btn.onclick=()=>{
+        challengeOpen=false;$("#challengeOverlay").classList.remove("show");
+        state.badges.push("⚠️ NO TODO ES IPR");
+        sfx.final();showToast("⚠️ NO TODO ES IPR");
+        setTimeout(finishGame,1400);
+      };
+    }
+  },60);
+}
+
+/* -------------------------- LEVEL FLOW -------------------------- */
+function startGame(){
+  groupName=$("#groupName").value.trim()||"Grupo sin nombre";
+  $("#startScreen").style.display="none";$("#gameScreen").style.display="block";
+  gameStarted=true;levelIndex=0;totalStartTime=performance.now();levelStartTime=performance.now();
+  levelTimerActive=false;levelTimeoutHandled=false;
+  $("#clock").textContent=formatTime(LEVEL_TIME_LIMIT);
+  ensureAudio();clearTimeout(musicTimer);startMusic();buildLevel(0);showLevelSplash();
+  lastTime=performance.now();cancelAnimationFrame(animationId);animationId=requestAnimationFrame(loop);
+}
+function showLevelSplash(){
+  levelTransition=true;
+  $("#splashTitle").textContent=`${levelMeta[levelIndex].name} — ${levelMeta[levelIndex].title}`;
+  $("#splashSubtitle").textContent=levelMeta[levelIndex].objective + "  " + levelMeta[levelIndex].mechanic +
+    `  TENÉS ${LEVEL_TIME_LIMIT} SEGUNDOS. Al llegar a 0, el juego pasa automáticamente al nivel siguiente. ` +
+    `Intentá recolectar Q-Coins y resolver tantas terminales AMFE como puedas. ` +
+    "Los arcos de monedas marcan rutas de salto hacia plataformas elevadas.";
+  $("#levelSplash").classList.add("show");
+}
+$("#splashBtn").onclick=()=>{
+  $("#levelSplash").classList.remove("show");
+  levelTransition=false;
+  startLevelTimer();
+};
+function finishLevel(){
+  if(levelTransition)return;
+  stopLevelTimer();
+  levelTimeoutHandled=true;
+  levelTransition=true;sfx.level();
+  const b=levelMeta[levelIndex].badge;
+  if(!state.badges.includes(b))state.badges.push(b);
+  showToast(`${b}<br><small>INSIGNIA OBTENIDA</small>`);
+  setTimeout(()=>{
+    levelIndex++;
+    buildLevel(levelIndex);
+    updateHud();
+    showLevelSplash();
+  },1500);
+}
+function finishGame(){
+  stopLevelTimer();
+  gameStarted=false;cancelAnimationFrame(animationId);clearTimeout(musicTimer);
+  $("#gameScreen").style.display="none";$("#finalScreen").style.display="grid";
+  $("#finalGroup").textContent=groupName;
+  $("#finalScore").textContent=state.score;
+  $("#finalPct").textContent=state.score;
+  $("#finalChips").textContent=state.chips;
+  const profile=pickProfile();
+  $("#finalProfile").textContent=profile;
+  const cats=[
+    ["MODO – EFECTO – CAUSA",state.category.conceptos,25],
+    ["CONTROLES",state.category.controles,15],
+    ["S / O / D",state.category.sod,25],
+    ["IPR",state.category.ipr,10],
+    ["ACCIONES",state.category.acciones,15],
+    ["DESAFÍO FINAL",state.category.final,10]
+  ];
+  $("#categoryGrid").innerHTML=cats.map(([n,v,m])=>`<div class="scoreCard"><b>${n}</b><br>${v}/${m}</div>`).join("");
+  $("#finalBadges").innerHTML=state.badges.map(b=>`<span class="badge">${b}</span>`).join("");
+  saveGroupScore();
+  renderRanking("#finalRanking");
+}
+function pickProfile(){
+  const c=state.category;
+  const ratios=[
+    ["CAZADOR DE CAUSAS",c.conceptos/25],
+    ["ESPECIALISTA EN DETECCIÓN",(c.controles/15+c.sod/25)/2],
+    ["ANALISTA PREVENTIVO",c.acciones/15],
+    ["ESTRATEGA DEL RIESGO",(c.ipr/10+c.final/10)/2]
+  ].sort((a,b)=>b[1]-a[1]);
+  return ratios[0][0];
+}
+function togglePause(){
+  if(challengeOpen||levelTransition)return;
+  paused=!paused;
+  $("#pauseOverlay").classList.toggle("show",paused);
+
+  if(paused){
+    pauseStartedAt=performance.now();
+    clearTimeout(musicTimer);
+  }else{
+    if(levelTimerActive && pauseStartedAt){
+      levelDeadline += performance.now()-pauseStartedAt;
+      pauseStartedAt=0;
+    }
+    if(musicOn)startMusic();
+  }
+}
+$("#resumeBtn").onclick=()=>togglePause();
+
+/* -------------------------- FINAL COPY / MOODLE -------------------------- */
+
+function getResultData(){
+  return {
+    group: groupName,
+    score: state.score,
+    profile: $("#finalProfile").textContent,
+    chips: state.chips,
+    badges: [...state.badges],
+    categories: [
+      ["MODO – EFECTO – CAUSA", state.category.conceptos, 25],
+      ["CONTROLES", state.category.controles, 15],
+      ["S / O / D", state.category.sod, 25],
+      ["IPR", state.category.ipr, 10],
+      ["ACCIONES", state.category.acciones, 15],
+      ["DESAFÍO FINAL", state.category.final, 10]
+    ],
+    r2: $("#r2").value.trim(),
+    r4: $("#r4").value.trim(),
+    r5: $("#r5").value.trim()
+  };
+}
+
+function buildMoodleText(data){
+  return `=================================
+MISIÓN AMFE — PROTOCOLO BROTE CERO
+Grupo: ${data.group}
+Puntaje: ${data.score}/100
+Perfil: ${data.profile}
+Q-Coins: ${data.chips}
+
+Insignias:
+${data.badges.length ? data.badges.map(b=>"- "+b).join("\\n") : "- Sin insignias registradas"}
+
+DESEMPEÑO:
+${data.categories.map(c=>`${c[0]}: ${c[1]}/${c[2]}`).join("\\n")}
+
+REFLEXIÓN
+
+1. Modo / efecto / causa:
+${data.r2 || "[sin respuesta]"}
+
+2. ¿El mayor IPR siempre debe tratarse primero?
+${data.r4 || "[sin respuesta]"}
+
+3. Aplicación al trabajo práctico:
+${data.r5 || "[sin respuesta]"}
+=================================`;
+}
+
+function wrapCanvasText(ctx, text, x, y, maxWidth, lineHeight, maxLines=99, align="left"){
+  const paragraphs=String(text||"").split(/\\n/);
+  let linesDrawn=0;
+  ctx.textAlign=align;
+  for(const paragraph of paragraphs){
+    const words=paragraph.split(/\\s+/).filter(Boolean);
+    if(words.length===0){
+      y+=lineHeight; linesDrawn++;
+      continue;
+    }
+    let line="";
+    for(const word of words){
+      const test=line ? line+" "+word : word;
+      if(ctx.measureText(test).width>maxWidth && line){
+        ctx.fillText(line,x,y);
+        y+=lineHeight; linesDrawn++;
+        if(linesDrawn>=maxLines) return y;
+        line=word;
+      }else{
+        line=test;
+      }
+    }
+    if(line && linesDrawn<maxLines){
+      ctx.fillText(line,x,y);
+      y+=lineHeight; linesDrawn++;
+    }
+    if(linesDrawn>=maxLines) return y;
+  }
+  return y;
+}
+
+function roundedRect(ctx,x,y,w,h,r){
+  const rr=Math.min(r,w/2,h/2);
+  ctx.beginPath();
+  ctx.moveTo(x+rr,y);
+  ctx.arcTo(x+w,y,x+w,y+h,rr);
+  ctx.arcTo(x+w,y+h,x,y+h,rr);
+  ctx.arcTo(x,y+h,x,y,rr);
+  ctx.arcTo(x,y,x+w,y,rr);
+  ctx.closePath();
+}
+
+function generateResultImage(){
+  const data=getResultData();
+  const out=document.createElement("canvas");
+  out.width=1200;
+  out.height=1800;
+  const g=out.getContext("2d");
+
+  g.fillStyle="#0b1020";
+  g.fillRect(0,0,out.width,out.height);
+
+  // Cabecera retro.
+  g.fillStyle="#17213b";
+  g.fillRect(40,40,1120,230);
+  g.strokeStyle="#f3df95";
+  g.lineWidth=6;
+  g.strokeRect(40,40,1120,230);
+
+  g.textAlign="center";
+  g.fillStyle="#ffd54a";
+  g.font="bold 58px Courier New";
+  g.fillText("MISIÓN AMFE",600,115);
+  g.fillStyle="#fffef2";
+  g.font="bold 30px Courier New";
+  g.fillText("PROTOCOLO BROTE CERO",600,162);
+  g.font="22px Courier New";
+  g.fillText("RESULTADO DEL EQUIPO",600,205);
+
+  g.textAlign="left";
+  g.fillStyle="#dbe7f7";
+  g.font="bold 24px Courier New";
+  g.fillText(`Grupo: ${data.group}`,75,245);
+
+  const cards=[
+    ["PUNTAJE",`${data.score}/100`],
+    ["PERFIL",data.profile],
+    ["Q-COINS",String(data.chips)]
+  ];
+  const cardY=305, gap=20, cardW=(1120-gap*2)/3;
+  cards.forEach((c,i)=>{
+    const x=40+i*(cardW+gap);
+    g.fillStyle="#17213b"; roundedRect(g,x,cardY,cardW,150,10); g.fill();
+    g.strokeStyle="#536783"; g.lineWidth=4; g.stroke();
+    g.fillStyle="#4bd5d1"; g.font="bold 22px Courier New"; g.textAlign="center";
+    g.fillText(c[0],x+cardW/2,cardY+45);
+    g.fillStyle="#fffef2";
+    g.font=i===1 ? "bold 20px Courier New" : "bold 36px Courier New";
+    wrapCanvasText(g,c[1],x+cardW/2,cardY+91,cardW-35,27,2,"center");
+  });
+
+  g.textAlign="left";
+  g.fillStyle="#ffd54a"; g.font="bold 30px Courier New";
+  g.fillText("DESEMPEÑO POR CATEGORÍA",50,510);
+
+  let y=550;
+  data.categories.forEach(([name,value,max])=>{
+    g.fillStyle="#17213b"; roundedRect(g,50,y,1100,62,7); g.fill();
+    g.fillStyle="#eef2df"; g.font="bold 20px Courier New"; g.textAlign="left";
+    g.fillText(name,72,y+38);
+    g.fillStyle="#2c3a54"; g.fillRect(620,y+20,340,20);
+    g.fillStyle="#53d769"; g.fillRect(620,y+20,340*Math.max(0,Math.min(1,value/max)),20);
+    g.textAlign="right"; g.fillStyle="#ffd54a"; g.fillText(`${value}/${max}`,1125,y+38);
+    y+=74;
+  });
+
+  y+=18;
+  g.textAlign="left"; g.fillStyle="#ffd54a"; g.font="bold 30px Courier New";
+  g.fillText("INSIGNIAS",50,y); y+=42;
+  g.fillStyle="#fffef2"; g.font="20px Courier New";
+  y=wrapCanvasText(g,data.badges.length?data.badges.join("  •  "):"Sin insignias registradas",60,y,1080,30,4);
+
+  y+=24;
+  g.fillStyle="#ffd54a"; g.font="bold 30px Courier New";
+  g.fillText("REFLEXIÓN FINAL",50,y); y+=42;
+
+  const reflections=[
+    ["1. MODO / EFECTO / CAUSA", data.r2 || "[sin respuesta]"],
+    ["2. ¿EL MAYOR IPR SIEMPRE DEBE TRATARSE PRIMERO?", data.r4 || "[sin respuesta]"],
+    ["3. APLICACIÓN AL TRABAJO PRÁCTICO", data.r5 || "[sin respuesta]"]
+  ];
+
+  reflections.forEach(([title,text])=>{
+    const boxH=225;
+    g.fillStyle="#17213b"; roundedRect(g,50,y,1100,boxH,8); g.fill();
+    g.strokeStyle="#536783"; g.lineWidth=3; g.stroke();
+    g.fillStyle="#4bd5d1"; g.font="bold 20px Courier New"; g.textAlign="left";
+    let ty=wrapCanvasText(g,title,75,y+38,1045,27,2);
+    g.fillStyle="#fffef2"; g.font="19px Courier New";
+    wrapCanvasText(g,text,75,ty+12,1045,27,5);
+    y+=boxH+18;
+  });
+
+  g.fillStyle="#10273b";
+  g.fillRect(40,1730,1120,46);
+  g.fillStyle="#dbe7f7";
+  g.font="17px Courier New";
+  g.textAlign="center";
+  g.fillText("PROCESO/FUNCIÓN → MODO/RIESGO → EFECTO → CAUSA → CONTROLES → S/O/D → IPR → ACCIÓN",600,1759);
+
+  const safe=(data.group||"grupo").replace(/[^a-zA-Z0-9_\-áéíóúñÁÉÍÓÚÑ]+/g,"_").slice(0,40);
+  const link=document.createElement("a");
+  link.download=`Mision_AMFE_${safe}.png`;
+  link.href=out.toDataURL("image/png");
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+}
+
+$("#copyBtn").onclick=async()=>{
+  const data=getResultData();
+  const text=buildMoodleText(data);
+  try{
+    await navigator.clipboard.writeText(text);
+  }catch(e){
+    const ta=document.createElement("textarea");
+    ta.value=text;
+    ta.style.position="fixed";
+    ta.style.opacity="0";
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    ta.remove();
+  }
+  generateResultImage();
+  $("#copyMsg").textContent="RESULTADO COPIADO Y FICHA PNG GENERADA. Pueden pegar el texto en Moodle y adjuntar la imagen descargada.";
+  $("#copyMsg").classList.add("show");
+};
+
+$("#imageBtn").onclick=()=>{
+  generateResultImage();
+  $("#copyMsg").textContent="FICHA PNG GENERADA. Pueden adjuntarla directamente en Moodle.";
+  $("#copyMsg").classList.add("show");
+};
+
+$("#restartBtn").onclick=()=>location.reload();
+
+/* -------------------------- BUTTONS -------------------------- */
+$("#startBtn").onclick=async()=>{
+  if(!menuAudioStarted){
+    await startMenuMusic(false);
+  }
+  startGame();
+};
+
+// Los navegadores no permiten autoplay real sin interacción.
+// La portada usa una puerta de audio explícita para que el usuario sepa qué hacer.
+async function unlockMenuAudio(){
+  if(menuAudioStarted) return;
+  try{
+    await startMenuMusic(true);
+    const gate=$("#audioGate");
+    gate.classList.add("audioReady");
+    setTimeout(()=>gate.classList.add("hidden"),620);
+  }catch(err){
+    const hint=$("#audioHint");
+    if(hint) hint.textContent="No se pudo iniciar el audio. Revisá el volumen del navegador/dispositivo.";
+  }
+}
+
+$("#activateAudioBtn").addEventListener("click",unlockMenuAudio);
+
+// Si el usuario ignora el botón y toca otra parte de la portada, también intentamos habilitar audio.
+function activateMenuAudioFromGesture(e){
+  if(gameStarted || menuAudioStarted || !musicOn) return;
+  if(e && e.target && e.target.closest && e.target.closest("#musicBtnStart")) return;
+  unlockMenuAudio();
+}
+$("#startScreen").addEventListener("keydown",activateMenuAudioFromGesture);
+
+$("#musicBtnStart").onclick=()=>{
+  if(!menuAudioStarted && musicOn){ unlockMenuAudio(); return; }
+  setMusic(!musicOn);
+};
+$("#musicBtnGame").onclick=()=>setMusic(!musicOn);
+$("#sfxBtnStart").onclick=()=>setSfx(!sfxOn);
+$("#sfxBtnGame").onclick=()=>setSfx(!sfxOn);
+$("#pauseBtn").onclick=()=>togglePause();
+
+/* Prevenir scroll táctil sobre controles */
+document.addEventListener("touchmove",e=>{
+  if(gameStarted && e.target.closest("#gameScreen")) e.preventDefault();
+},{passive:false});
+
+/* Mantener el canvas encajado sin deformar la resolución interna */
+function fitCanvas(){
+  const ratio=W/H, wr=innerWidth/innerHeight;
+  if(wr>ratio){canvas.style.height="100vh";canvas.style.width="auto";}
+  else{canvas.style.width="100vw";canvas.style.height="auto";}
+}
+addEventListener("resize",fitCanvas);fitCanvas();
+renderRanking("#startRanking");
+
+/* Pantalla inicial animada simple */
+(function idle(){
+  if(gameStarted)return;
+  requestAnimationFrame(idle);
+})();
+</script>
+</body>
+</html>
